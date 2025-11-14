@@ -42,6 +42,7 @@ public class StockFrequencyService {
         }
 
         // 3) намираме swing движения (обща логика)
+        System.out.println("Record count for " + stock.getStockCode() + ": " + records.size());
         List<Swing> swings = SwingDetector.detectSwings(records);
 
         if (swings.isEmpty()) {
@@ -68,7 +69,10 @@ public class StockFrequencyService {
     // DAILY — директно използваме swing периода
     // ============================================
     private void saveFrequencies(Stock stock, List<Swing> swings, PeriodType type) {
+
+        System.out.println("Detected swings for " + stock.getStockCode() + ": " + swings.size());
         for (Swing s : swings) {
+            System.out.println(" → swing " + s.fromDate() + " → " + s.toDate() + " (" + s.days() + " days)");
             BigDecimal freq = BigDecimal.ONE
                     .divide(BigDecimal.valueOf(s.days()), 6, java.math.RoundingMode.HALF_UP);
 

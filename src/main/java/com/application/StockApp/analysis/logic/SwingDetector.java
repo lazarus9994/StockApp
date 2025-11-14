@@ -13,7 +13,8 @@ public class SwingDetector {
     public record Swing(LocalDate fromDate, LocalDate toDate, long days) {}
 
     public static List<Swing> detectSwings(List<StockRecord> records) {
-        if (records.size() < 3) return List.of();
+
+        if (records.size() < 10) return List.of();
 
         List<BigDecimal> prices = new ArrayList<>();
         List<LocalDate> dates = new ArrayList<>();
@@ -23,34 +24,76 @@ public class SwingDetector {
             dates.add(r.getDate());
         }
 
+        // =====================================================
+        // 1) AUTO-TUNE PARAMETERS (EPS and WINDOW)
+        // =====================================================
+        BigDecimal avgVolatility = estimateVolatility(prices);
+
+        // ако средната промяна е малка → EPS е супер малък
+        BigDecimal EPS = avgVolatility.multiply(BigDecimal.valueOf(2));
+        if (EPS.compareTo(BigDecimal.valueOf(0.0001)) < 0)
+            EPS = BigDecimal.valueOf(0.0001);  // минимум 0.01%
+
+        int WINDOW = avgVolatility.compareTo(new BigDecimal("0.002")) > 0 ? 2 : 5;
+
+        System.out.println("AUTO EPS = " + EPS + ", WINDOW = " + WINDOW);
+
+        // =====================================================
+        // 2) Detect swings
+        // =====================================================
         List<Swing> swings = new ArrayList<>();
+        int n = prices.size();
+        int lastSwingIndex = 0;
 
-        boolean rising = prices.get(1).compareTo(prices.get(0)) > 0;
-        int swingStart = 0;
+        for (int i = WINDOW; i < n - WINDOW; i++) {
+            BigDecimal p = prices.get(i);
 
-        for (int i = 1; i < prices.size() - 1; i++) {
-            BigDecimal prev = prices.get(i - 1);
-            BigDecimal curr = prices.get(i);
-            BigDecimal next = prices.get(i + 1);
+            boolean isHigh = true;
+            boolean isLow = true;
 
-            boolean isTop = curr.compareTo(prev) > 0 && curr.compareTo(next) > 0;
-            boolean isBottom = curr.compareTo(prev) < 0 && curr.compareTo(next) < 0;
+            for (int k = 1; k <= WINDOW; k++) {
+                BigDecimal prev = prices.get(i - k);
+                BigDecimal next = prices.get(i + k);
 
-            if (isTop || isBottom) {
-                LocalDate start = dates.get(swingStart);
+                if (p.compareTo(prev.multiply(BigDecimal.ONE.add(EPS))) <= 0) isHigh = false;
+                if (p.compareTo(next.multiply(BigDecimal.ONE.add(EPS))) <= 0) isHigh = false;
+
+                if (p.compareTo(prev.multiply(BigDecimal.ONE.subtract(EPS))) >= 0) isLow = false;
+                if (p.compareTo(next.multiply(BigDecimal.ONE.subtract(EPS))) >= 0) isLow = false;
+            }
+
+            if (isHigh || isLow) {
+                LocalDate start = dates.get(lastSwingIndex);
                 LocalDate end = dates.get(i);
                 long days = ChronoUnit.DAYS.between(start, end);
 
-                if (days > 0) {
-                    swings.add(new Swing(start, end, days));
-                }
+                if (days > 0) swings.add(new Swing(start, end, days));
 
-                swingStart = i;
-                rising = !rising;
+                lastSwingIndex = i;
             }
         }
 
         return swings;
+    }
+
+    private static BigDecimal estimateVolatility(List<BigDecimal> prices) {
+        BigDecimal total = BigDecimal.ZERO;
+        int count = 0;
+
+        for (int i = 1; i < prices.size(); i++) {
+            BigDecimal p1 = prices.get(i - 1);
+            BigDecimal p2 = prices.get(i);
+
+            if (p1.compareTo(BigDecimal.ZERO) == 0) continue;
+
+            BigDecimal change = p2.subtract(p1).abs().divide(p1, 6, RoundingMode.HALF_UP);
+            total = total.add(change);
+            count++;
+        }
+
+        if (count == 0) return BigDecimal.valueOf(0.001);
+
+        return total.divide(BigDecimal.valueOf(count), 6, RoundingMode.HALF_UP);
     }
 
     private static BigDecimal mid(StockRecord r) {
