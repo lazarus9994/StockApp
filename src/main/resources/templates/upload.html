@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="fragments/_layout :: content(~{::body})">
+<body>
+<section class="card form-card">
+    <h1 class="page-title">Import Stock CSV</h1>
+    <p>Upload a file like <code>AAPL-history.csv</code> from your data folder.</p>
+
+    <div class="message success" th:if="${success}" th:text="${success}"></div>
+    <div class="message error" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/upload}" method="post" enctype="multipart/form-data" class="upload-form">
+        <label>Select CSV File:</label>
+        <input class="input" type="file" name="file" accept=".csv" required>
+        <button type="submit" class="btn btn-primary">Upload & Import</button>
+    </form>
+</section>
+</body>
+</html>

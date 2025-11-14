@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::body})}">
+
+<body>
+
+<section class="stock-details">
+    <h1 th:text="${stock.stockName} + ' (' + ${stock.stockCode} + ')'">Apple Inc. (AAPL)</h1>
+    <p>Industry: <span th:text="${stock.industry}">Technology</span></p>
+
+    <!-- PRICE HISTORY -->
+    <div class="card wide">
+        <h3>📈 Price History</h3>
+        <canvas id="stockChart"></canvas>
+    </div>
+
+    <!-- TABLE OF RECORDS -->
+    <div class="card wide">
+        <h3>Recent Records</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Open</th>
+                <th>Close</th>
+                <th>Volume</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${records}">
+                <td th:text="${r.date}"></td>
+                <td th:text="${r.open}"></td>
+                <td th:text="${r.close}"></td>
+                <td th:text="${r.volume}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="/stocks" class="btn">← Back to Stocks</a>
+</section>
+
+<!-- ANALYSIS SECTION -->
+<section>
+    <h2 th:text="'Analysis for ' + ${stock.stockCode}"></h2>
+
+    <div class="card wide">
+        <h3>Mass Over Time</h3>
+        <canvas id="massChart"></canvas>
+    </div>
+
+    <div class="card wide">
+        <h3>Daily Frequency Over Time</h3>
+        <canvas id="freqChart"></canvas>
+    </div>
+</section>
+
+<!-- SINGLE Chart.js import -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Combined Thymeleaf-enabled JS -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+        // ==== PRICE CHART ====
+        const records = [[${records}]];
+        const labels = records.map(r => r.date);
+        const closes = records.map(r => r.close);
+
+        new Chart(document.getElementById('stockChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Close Price',
+                    data: closes,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 0
+                }]
+            }
+        });
+
+        // ==== ANALYSIS CHARTS ====
+        const code = [[${stock.stockCode}]];
+
+        fetch(`/api/analysis/${code}`)
+            .then(res => res.json())
+            .then(data => {
+                const analysisLabels = data.map(a => a.date);
+                const masses = data.map(a => Number(a.mass));
+                const freqs = data.map(a => Number(a.dailyFrequency));
+
+                new Chart(document.getElementById("massChart"), {
+                    type: "line",
+                    data: {
+                        labels: analysisLabels,
+                        datasets: [{
+                            label: "Mass",
+                            data: masses,
+                            borderWidth: 2
+                        }]
+                    }
+                });
+
+                new Chart(document.getElementById("freqChart"), {
+                    type: "line",
+                    data: {
+                        labels: analysisLabels,
+                        datasets: [{
+                            label: "Daily Frequency",
+                            data: freqs,
+                            borderWidth: 2
+                        }]
+                    }
+                });
+            });
+
+    /*]]>*/
+</script>
+
+</body>
+</html>

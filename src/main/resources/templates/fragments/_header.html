@@ -1,0 +1,10 @@
+<header th:fragment="header" class="topbar" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="logo">📈 StockApp</div>
+    <nav class="nav">
+        <a th:href="@{/}" class="nav-link">Dashboard</a>
+        <a th:href="@{/stocks}" class="nav-link">Stocks</a>
+        <a th:href="@{/upload}" class="nav-link">Import</a>
+        <a th:href="@{/profile}" class="nav-link">Profile</a>
+        <a th:href="@{/logout}" class="nav-btn">Logout</a>
+    </nav>
+</header>

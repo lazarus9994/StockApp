@@ -1,0 +1,246 @@
+/* === RESET === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* === COLOR VARIABLES === */
+:root {
+  --bg: #0d1117;
+  --bg-card: #161b22;
+  --text: #c9d1d9;
+  --accent: #58a6ff;
+  --muted: #8b949e;
+  --border: #30363d;
+  --danger: #f85149;
+}
+
+/* === BASE === */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* === APP CONTAINER (за всички страници с layout) === */
+.app-container {
+  display: grid;
+  grid-template-columns: 240px 1fr; /* sidebar + content */
+  height: 100vh;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  background-color: #161b22;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-right: 1px solid var(--border);
+  height: 100vh;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.logo-section .logo {
+  font-size: 28px;
+}
+
+.logo-section h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.nav-item:hover {
+  background: #1e293b;
+  color: #fff;
+}
+
+.nav-item.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* === MAIN CONTENT (dashboard, stocks, analytics и т.н.) === */
+.main-content {
+  background-color: var(--bg);
+  padding: 40px;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+/* === DASHBOARD === */
+.page-title {
+  color: var(--accent);
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.page-subtitle {
+  color: var(--muted);
+  margin-bottom: 30px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 25px;
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.card.wide {
+  grid-column: span 2;
+}
+
+canvas {
+  width: 100% !important;
+  max-height: 400px;
+}
+
+/* === BUTTONS === */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 6px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+}
+
+.btn-primary:hover {
+  background-color: #3c8be8;
+}
+
+/* === SCROLLBAR === */
+.main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 5px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+/* === AUTH PAGES (login / register) === */
+body.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0f172a;
+  overflow: hidden;
+}
+
+body.auth-page .app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+body.auth-page .sidebar {
+  display: none !important;
+}
+
+body.auth-page .main-content {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body.auth-page .card {
+  width: 400px;
+  background-color: var(--bg-card);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .app-container {
+    grid-template-columns: 80px 1fr;
+  }
+
+  .sidebar {
+    padding: 10px;
+  }
+
+  .logo-section h2,
+  .nav-item span {
+    display: none;
+  }
+
+  .nav-item {
+    justify-content: center;
+  }
+}
+
+.watchlist-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.watchlist-table th, .watchlist-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #30363d;
+}
+
+.btn {
+    background: #58a6ff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn.danger {
+    background: #d73a49;
+}

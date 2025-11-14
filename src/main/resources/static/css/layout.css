@@ -1,0 +1,30 @@
+body {
+  font-family: system-ui, sans-serif;
+  background: #f8f9fa;
+  color: #333;
+  margin: 0;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  background: #111827;
+  color: white;
+  padding: 1rem 2rem;
+}
+.nav-link, .nav-btn {
+  color: #ddd;
+  margin-left: 1rem;
+  text-decoration: none;
+}
+.nav-link:hover { color: white; }
+.content-wrapper {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: auto;
+}
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background: #111827;
+  color: #aaa;
+}

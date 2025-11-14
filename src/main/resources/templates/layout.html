@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: 'StockApp'">StockApp</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body th:with="path=${currentPath} ?: '/'"
+      th:class="${#strings.startsWith(path,'/login') or #strings.startsWith(path,'/register') ? 'auth-page' : 'app-layout'}">
+
+
+<div class="app-container">
+
+    <!-- === Sidebar === -->
+    <aside class="sidebar"
+           th:if="${currentPath == null or (!#strings.startsWith(currentPath ?: '', '/login') and !#strings.startsWith(currentPath ?: '', '/register'))}">
+        <div class="logo-section">
+            <span class="logo">💹</span>
+            <h2>StockApp</h2>
+        </div>
+
+        <nav class="nav-links">
+            <a th:href="@{/}" class="nav-item"
+               th:classappend="${currentPath != null and currentPath == '/'} ? ' active'">
+                <i>🏠</i><span>Dashboard</span>
+            </a>
+
+            <a th:href="@{/stocks}" class="nav-item"
+               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/stocks')} ? ' active'">
+                <i>📈</i><span>Stocks</span>
+            </a>
+
+            <a th:href="@{/analytics}" class="nav-item"
+               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/analytics')} ? ' active'">
+                <i>📊</i><span>Analytics</span>
+            </a>
+
+            <a th:href="@{/profile}" class="nav-item"
+               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/profile')} ? ' active'">
+                <i>👤</i><span>Profile</span>
+            </a>
+
+            <a th:href="@{/logout}" class="nav-item"><i>🚪</i><span>Logout</span></a>
+        </nav>
+    </aside>
+
+    <!-- === Main content area === -->
+    <main class="main-content">
+        <th:block th:replace="${content}"></th:block>
+    </main>
+</div>
+
+</body>
+</html>

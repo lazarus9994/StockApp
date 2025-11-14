@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{layout :: layout(~{::body})}">
+<body>
+<section style="text-align:center; margin-top:100px;">
+    <h2 style="color:#cc0000;">Oops! Something went wrong.</h2>
+
+    <p th:text="'Error: ' + ${status} + ' - ' + ${error}" style="margin-top:20px;"></p>
+    <p th:text="${message}" style="color:#555;"></p>
+
+    <div style="margin-top:30px;">
+        <a th:href="@{/}" style="color:blue; text-decoration:underline;">Back to Home</a>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::body})}">
+<body>
+<section>
+    <h2>My Portfolio</h2>
+    <p th:text="'Total stocks: ' + ${portfolioSize}"></p>
+</section>
+</body>
+</html>
