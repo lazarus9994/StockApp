@@ -1,10 +1,65 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
-<section>
-    <h2>Analytics</h2>
-    <p>Here you’ll see performance graphs, price changes, and portfolio trends.</p>
-</section>
-</body>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="layout :: layout(~{::content})">
+
+<content>
+
+    <h1>Analytics</h1>
+
+    <form method="get" id="stockForm">
+        <label>Select Stock:</label>
+        <select name="stock" onchange="location.href='/analytics/' + this.value">
+            <option value="">-- Select --</option>
+            <option th:each="s : ${stocks}"
+                    th:value="${s.stockCode}"
+                    th:text="${s.stockCode}"
+                    th:selected="${stock != null and stock.stockCode == s.stockCode}">
+            </option>
+        </select>
+    </form>
+
+    <div th:if="${stock != null}">
+
+        <h2 th:text="'Analytics for ' + ${stock.stockCode}"></h2>
+
+        <h3>Price</h3>
+        <canvas id="priceChart"></canvas>
+
+        <h3>Mass</h3>
+        <canvas id="massChart"></canvas>
+
+        <h3>Daily Frequency</h3>
+        <canvas id="dailyChart"></canvas>
+
+        <h3>Weekly Frequency</h3>
+        <canvas id="weeklyChart"></canvas>
+
+        <h3>Monthly Frequency</h3>
+        <canvas id="monthlyChart"></canvas>
+
+        <h3>Yearly Frequency</h3>
+        <canvas id="yearlyChart"></canvas>
+
+        <script th:inline="javascript">
+            const dates = /*[[${dates}]]*/ [];
+            const closes = /*[[${closes}]]*/ [];
+
+            const massDates = /*[[${massDates}]]*/ [];
+            const massValues = /*[[${massValues}]]*/ [];
+
+            const daily = /*[[${daily}]]*/ [];
+            const weekly = /*[[${weekly}]]*/ [];
+            const monthly = /*[[${monthly}]]*/ [];
+            const yearly = /*[[${yearly}]]*/ [];
+        </script>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script src="/js/analytics.js"></script>
+
+    </div>
+
+</content>
+
 </html>

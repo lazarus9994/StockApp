@@ -1,5 +1,6 @@
 package com.application.StockApp.stock.service;
 
+import com.application.StockApp.analysis.logic.IndexDetector;
 import com.application.StockApp.analysis.service.StockAnalysisService;
 import com.application.StockApp.analysis.service.StockFrequencyService;
 import com.application.StockApp.analysis.service.StockMassService;
@@ -96,6 +97,13 @@ public class StockService {
 
                 recordRepository.save(record);
             }
+            List<StockRecord> allRecords = recordRepository.findAllByStock(stock);
+
+            if (IndexDetector.isLikelyIndex(allRecords)) {
+                System.out.println("⛔ Skipping INDEX dataset: " + stock.getStockCode());
+                return; // НЕ правим маса, честоти, анализ
+            }
+
             stockMassService.computeMasses(stock);
             stockFrequencyService.computeAllFrequencies(stock);
             stockAnalysisService.buildSummary(stock);

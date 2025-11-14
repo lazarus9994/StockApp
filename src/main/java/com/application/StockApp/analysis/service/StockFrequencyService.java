@@ -1,5 +1,7 @@
 package com.application.StockApp.analysis.service;
 
+import com.application.StockApp.analysis.dto.FrequencyPoint;
+import com.application.StockApp.analysis.logic.IndexDetector;
 import com.application.StockApp.analysis.logic.SwingDetector;
 import com.application.StockApp.analysis.logic.SwingDetector.Swing;
 import com.application.StockApp.analysis.model.StockFrequency;
@@ -40,6 +42,13 @@ public class StockFrequencyService {
             System.out.println("⚠️ Not enough records for frequency: " + stock.getStockCode());
             return;
         }
+
+        // NEW: auto index detection
+        if (IndexDetector.isLikelyIndex(records)) {
+            System.out.println("⛔ Skipping index-like dataset: " + stock.getStockCode());
+            return;
+        }
+
 
         // 3) намираме swing движения (обща логика)
         System.out.println("Record count for " + stock.getStockCode() + ": " + records.size());
@@ -184,4 +193,12 @@ public class StockFrequencyService {
             );
         }
     }
+
+    public List<FrequencyPoint> getFrequencyPoints(Stock stock, PeriodType type) {
+        return frequencyRepository.findAllByStockAndPeriodType(stock, type)
+                .stream()
+                .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
+                .toList();
+    }
+
 }

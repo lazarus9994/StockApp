@@ -1,5 +1,6 @@
 package com.application.StockApp.analysis.service;
 
+import com.application.StockApp.analysis.dto.MassPoint;
 import com.application.StockApp.analysis.model.StockMass;
 import com.application.StockApp.analysis.repository.StockMassRepository;
 import com.application.StockApp.records.model.StockRecord;
@@ -73,4 +74,12 @@ public class StockMassService {
         if (count == 0) return BigDecimal.ZERO;
         return sum.divide(BigDecimal.valueOf(count), 6, RoundingMode.HALF_UP);
     }
+
+    public List<MassPoint> getMassPoints(Stock stock) {
+        return massRepository.findAllByStock(stock)
+                .stream()
+                .map(m -> new MassPoint(m.getDate(), m.getMass()))
+                .toList();
+    }
+
 }

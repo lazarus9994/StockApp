@@ -1,11 +1,12 @@
 package com.application.StockApp.web;
 
+import com.application.StockApp.analysis.service.StockFrequencyService;
+import com.application.StockApp.analysis.service.StockMassService;
 import com.application.StockApp.records.model.StockRecord;
 import com.application.StockApp.records.repository.StockRecordRepository;
 import com.application.StockApp.stock.model.Stock;
 import com.application.StockApp.stock.repository.StockRepository;
-import com.application.StockApp.analysis.service.StockAnalysisService;
-import com.application.StockApp.analysis.service.StockAnalysisBatchService;
+import com.application.StockApp.analysis.model.StockFrequency.PeriodType;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -21,53 +22,71 @@ public class AnalyticsController {
 
     private final StockRepository stockRepository;
     private final StockRecordRepository recordRepository;
+    private final StockMassService stockMassService;
+    private final StockFrequencyService  stockFrequencyService;
 
-    private final StockAnalysisService stockAnalysisService;     // ✅ ДОБАВЕНО
-    private final StockAnalysisBatchService batchService;        // ✅ ДОБАВЕНО
+
 
     @GetMapping("/analytics")
     public String analytics(Model model) {
-        List<Stock> allStocks = stockRepository.findAll();
+        model.addAttribute("stocks", stockRepository.findAll());
+        return "analytics";
+    }
 
-        if (!allStocks.isEmpty()) {
-            Stock first = allStocks.get(0);
-            List<StockRecord> records = recordRepository.findAll().stream()
-                    .filter(r -> r.getStock().getId().equals(first.getId()))
-                    .sorted(Comparator.comparing(StockRecord::getDate))
-                    .limit(10)
-                    .collect(Collectors.toList());
+    @GetMapping("/analytics/{code}")
+    public String analyticsForStock(@PathVariable String code, Model model) {
 
-            List<String> dates = records.stream()
-                    .map(r -> r.getDate().toString())
-                    .toList();
+        Stock stock = stockRepository.findByStockCodeIgnoreCase(code)
+                .orElseThrow(() -> new RuntimeException("Stock not found: " + code));
 
-            List<Double> closes = records.stream()
-                    .map(r -> r.getClose().doubleValue())
-                    .toList();
+        List<StockRecord> records = recordRepository.findAllByStock(stock)
+                .stream()
+                .sorted(Comparator.comparing(StockRecord::getDate))
+                .toList();
 
-            model.addAttribute("stock", first);
-            model.addAttribute("dates", dates);
-            model.addAttribute("closes", closes);
-        }
+        // ===============================
+        // PRICE SERIES
+        // ===============================
+        List<String> dates = records.stream()
+                .map(r -> r.getDate().toString())
+                .toList();
+
+        List<Double> closes = records.stream()
+                .map(r -> r.getClose().doubleValue())
+                .toList();
+
+        // ===============================
+        // MASS SERIES
+        // ===============================
+        var masses = stockMassService.getMassPoints(stock); // -> List<MassPoint>
+
+        List<String> massDates = masses.stream().map(m -> m.date().toString()).toList();
+        List<Double> massValues = masses.stream().map(m -> m.mass().doubleValue()).toList();
+
+        // ===============================
+        // FREQUENCY SERIES
+        // ===============================
+        var daily = stockFrequencyService.getFrequencyPoints(stock, PeriodType.DAILY);
+        var weekly = stockFrequencyService.getFrequencyPoints(stock, PeriodType.WEEKLY);
+        var monthly = stockFrequencyService.getFrequencyPoints(stock, PeriodType.MONTHLY);
+        var yearly = stockFrequencyService.getFrequencyPoints(stock, PeriodType.YEARLY);
+
+        model.addAttribute("stock", stock);
+
+        model.addAttribute("dates", dates);
+        model.addAttribute("closes", closes);
+
+        model.addAttribute("massDates", massDates);
+        model.addAttribute("massValues", massValues);
+
+        model.addAttribute("daily", daily);
+        model.addAttribute("weekly", weekly);
+        model.addAttribute("monthly", monthly);
+        model.addAttribute("yearly", yearly);
 
         return "analytics";
     }
 
-    @GetMapping("/analyze/{code}")
-    @ResponseBody
-    public String analyzeStock(@PathVariable String code) {
-        Stock stock = stockRepository.findByStockCode(code)
-                .orElseThrow(() -> new RuntimeException("Stock not found"));
 
-        stockAnalysisService.buildSummary(stock);    // или analyzeStock(), ако ползваш стария метод
-
-        return "✅ Done analyzing " + code;
-    }
-
-    @GetMapping("/analyze/history/all")
-    @ResponseBody
-    public String analyzeHistoryAll() {
-        batchService.analyzeAllStocksHistory();
-        return "OK";
-    }
 }
+
