@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{layout :: layout(~{::body})}">
+<body>
+<section class="user-home">
+    <h1 class="page-title">👤 My Watchlist</h1>
+    <p class="page-subtitle">Your personalized stock overview</p>
+
+    <div class="stock-list">
+        <div class="card stock-card" th:each="stock : ${userStocks}">
+            <h3 th:text="${stock.name}">Apple Inc.</h3>
+            <p>
+                Code: <span th:text="${stock.code}">AAPL</span><br>
+                Current Price: <span th:text="${stock.close}">$187.90</span><br>
+                Change: <span th:text="${stock.changePercent + '%'}"
+                              th:classappend="${stock.changePercent > 0} ? 'positive' : 'negative'">
+                </span>
+            </p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

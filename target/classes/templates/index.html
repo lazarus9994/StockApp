@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{layout :: layout(~{::body})}">
+<body>
+
+<section class="dashboard">
+    <h1 class="page-title">📊 Dashboard Overview</h1>
+    <p class="page-subtitle">Your personalized stock insights and market performance</p>
+
+    <!-- === Filter Form === -->
+    <div style="margin-bottom: 20px;">
+        <form id="rangeForm" style="display:flex; gap:10px;">
+            <select id="rangeSelect" name="range">
+                <option value="daily" th:selected="${range == 'daily'}">1 Day</option>
+                <option value="weekly" th:selected="${range == 'weekly'}">1 Week</option>
+                <option value="monthly" th:selected="${range == 'monthly'}">1 Month</option>
+                <option value="yearly" th:selected="${range == 'yearly'}">1 Year</option>
+                <option value="all" th:selected="${range == 'all'}">All Time</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- === Dashboard Grid === -->
+    <div class="dashboard-grid">
+
+        <!-- === Market Chart === -->
+        <div class="card wide" style="height: 380px;">
+            <h3 th:text="'NASDAQ (' + ${range} + ')'">Market Chart</h3>
+            <canvas id="marketChart" style="width:100%;height:300px;"></canvas>
+        </div>
+
+        <!-- === Watchlist === -->
+        <div class="card">
+            <h3>
+                <a th:href="@{/watchlist}" style="text-decoration:none; color:inherit;">Your Watchlist</a>
+            </h3>
+
+            <ul>
+                <li th:if="${#lists.isEmpty(watchlist)}">
+                    <em>No items in your watchlist yet.</em>
+                </li>
+
+                <li th:each="item : ${watchlist}">
+                    <span th:text="${item.stock.stockCode}">AAPL</span> —
+                    <span th:text="${item.stock.stockName}">Apple Inc.</span>
+
+                    <span th:if="${changes != null and item.stock != null and changes[item.stock.stockCode] != null}"
+                          th:text="${#numbers.formatDecimal(changes[item.stock.stockCode], 1, 2)} + '%'"
+                          th:classappend="${changes[item.stock.stockCode] > 0 ? 'green' : (changes[item.stock.stockCode] < 0 ? 'red' : '')}">
+                    </span>
+
+                    <span th:if="${changes == null or changes[item.stock.stockCode] == null}">—</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- === News === -->
+        <div class="card wide">
+            <h3>Latest Market News</h3>
+            <ul>
+                <li><strong>NASDAQ</strong> hits record high driven by AI sector growth.</li>
+                <li><strong>Oil prices</strong> dip 2% amid global demand concerns.</li>
+                <li><strong>Tech stocks</strong> recover after last week’s dip.</li>
+            </ul>
+        </div>
+
+    </div>
+</section>
+
+<!-- ========== Chart.js ========= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+<script src="/js/indexChart.js"></script>
+
+</body>
+</html>
+

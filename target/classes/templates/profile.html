@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{layout :: layout(~{::body})}">
+
+<body>
+
+<link rel="stylesheet" th:href="@{/css/profile.css}"/>
+
+<section class="profile-container" th:object="${profile}">
+
+    <h1 class="page-title">Profile</h1>
+
+    <!-- SUCCESS / ERROR -->
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+
+    <!-- ========================= -->
+    <!-- STATIC READ-ONLY PROFILE  -->
+    <!-- ========================= -->
+    <div id="staticProfile" class="card profile-card">
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" readonly th:value="*{fullName}">
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" readonly th:value="*{email}">
+        </div>
+
+        <div class="form-group">
+            <label>Role</label>
+            <input type="text" readonly th:value="${user.role}">
+        </div>
+
+        <div class="button-row">
+            <button id="editBtn" class="btn-primary">Edit Profile</button>
+        </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- EDIT MODE + CHANGE PASSWORD -->
+    <!-- ========================= -->
+    <form id="editForm"
+          th:action="@{/profile/update}"
+          method="post"
+          class="card profile-card hidden">
+
+        <h2>Edit Profile</h2>
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" th:field="*{fullName}">
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" th:field="*{email}">
+        </div>
+
+        <div class="form-group">
+            <label>Role</label>
+            <input type="text" readonly th:value="${user.role}">
+        </div>
+
+        <hr>
+
+        <h3>Change Password</h3>
+
+        <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" th:field="*{currentPassword}">
+        </div>
+
+        <div class="form-group">
+            <label>New Password</label>
+            <input type="password" th:field="*{newPassword}">
+        </div>
+
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" th:field="*{confirmPassword}">
+        </div>
+
+        <div class="button-row">
+            <button type="submit" class="btn-primary">Save Changes</button>
+            <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
+        </div>
+
+    </form>
+
+</section>
+
+<script src="/js/profile.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+/* Center container in main content */
+.profile-container {
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.profile-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #0003;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+    color: #c9d1d9;
+    font-size: 14px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    color: white;
+}
+
+.button-row {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: #238636;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6e7681;
+    color: white;
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.alert.success {
+    background: #1f6feb;
+    color: white;
+}
+
+.alert.error {
+    background: #da3633;
+    color: white;
+}
+
+/* Initially hidden sections */
+.hidden {
+    display: none;
+}

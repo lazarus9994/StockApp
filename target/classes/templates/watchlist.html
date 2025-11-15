@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{layout :: layout(~{::body})}">
+<body>
+<section class="dashboard">
+    <h1 class="page-title">⭐ Your Watchlist</h1>
+
+    <!-- ✅ Status messages -->
+    <div th:if="${param.added}" class="alert success">
+        ✅ Added <strong th:text="${param.added}"></strong> to your watchlist.
+    </div>
+    <div th:if="${param.removed}" class="alert danger">
+        🗑 Removed <strong th:text="${param.removed}"></strong> from your watchlist.
+    </div>
+
+    <div class="card wide">
+        <!-- === Add Form === -->
+        <form th:action="@{/watchlist/add}" method="post" style="margin-bottom: 1em; display: flex; gap: 10px;">
+            <select name="code" required>
+                <option value="" disabled selected>Select a stock</option>
+                <option th:each="stock : ${allStocks}"
+                        th:value="${stock.stockCode}"
+                        th:text="${stock.stockName + ' (' + stock.stockCode + ')'}"></option>
+            </select>
+            <button type="submit" class="btn btn-primary">➕ Add</button>
+        </form>
+
+        <!-- === Watchlist Table === -->
+        <table class="watchlist-table">
+            <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th style="text-align:right;">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${watchlist}">
+                <td th:text="${item.stock.stockCode}">AAPL</td>
+                <td th:text="${item.stock.stockName}">Apple Inc.</td>
+                <td style="text-align:right;">
+                    <form th:action="@{/watchlist/remove}" method="post" style="display:inline;">
+                        <input type="hidden" name="code" th:value="${item.stock.stockCode}">
+                        <button type="submit" class="btn danger">🗑 Remove</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(watchlist)}">
+                <td colspan="3" style="text-align:center;">Your watchlist is empty.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Optional: auto-hide success messages -->
+<script>
+    setTimeout(() => document.querySelectorAll('.alert').forEach(el => el.remove()), 3000);
+</script>
+
+<style>
+    .alert {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    .alert.success { background: #e0ffe0; color: #006400; }
+    .alert.danger { background: #ffe0e0; color: #8b0000; }
+</style>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="~{layout :: layout(~{::body})}">
+<body>
+
+<h1>Import Logs</h1>
+
+<ul>
+    <li th:each="i : ${imports}" th:text="${i}"></li>
+</ul>
+
+</body>
+</html>
