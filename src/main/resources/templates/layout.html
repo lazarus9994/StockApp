@@ -22,6 +22,7 @@
         </div>
 
         <nav class="nav-links">
+
             <a th:href="@{/}" class="nav-item"
                th:classappend="${currentPath != null and currentPath == '/'} ? ' active'">
                 <i>🏠</i><span>Dashboard</span>
@@ -42,8 +43,31 @@
                 <i>👤</i><span>Profile</span>
             </a>
 
-            <a th:href="@{/logout}" class="nav-item"><i>🚪</i><span>Logout</span></a>
+            <!-- Upload CSV -->
+            <a th:href="@{/upload}" class="nav-item"
+               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/upload')} ? ' active'">
+                <i>📤</i><span>Upload CSV</span>
+            </a>
+
+            <!-- Import Logs -->
+            <a th:href="@{/imports}" class="nav-item"
+               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/imports')} ? ' active'">
+                <i>📁</i><span>Import Logs</span>
+            </a>
+
+            <!-- Reports -->
+            <a th:href="@{/reports}" class="nav-item"
+               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/reports')} ? ' active'">
+                <i>📜</i><span>Reports</span>
+            </a>
+
+            <!-- Logout -->
+            <a th:href="@{/logout}" class="nav-item">
+                <i>🚪</i><span>Logout</span>
+            </a>
+
         </nav>
+
     </aside>
 
     <!-- === Main content area === -->
