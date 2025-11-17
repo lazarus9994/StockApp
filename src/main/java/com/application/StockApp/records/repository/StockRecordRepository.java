@@ -16,6 +16,7 @@ public interface StockRecordRepository extends JpaRepository<StockRecord, UUID> 
     List<StockRecord> findAllByStockOrderByDateAsc(Stock stock);
     List<StockRecord> findAllByStockAndDateBetweenOrderByDateAsc(Stock stock, LocalDate start, LocalDate end);
     boolean existsByStockAndDate(Stock stock, LocalDate date);
+    boolean existsByStock(Stock stock);
 
 
     // --- 📅 Седмична агрегация (native SQL) ---
@@ -112,7 +113,6 @@ public interface StockRecordRepository extends JpaRepository<StockRecord, UUID> 
     LIMIT 1
 """)
     Double findLatestChangePercentByStock(@Param("stock") Stock stock);
-
 
 
 }

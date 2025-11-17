@@ -1,3 +1,5 @@
+package com.application.StockApp.web;
+
 import com.application.StockApp.analysis.dto.FrequencyPoint;
 import com.application.StockApp.analysis.dto.MassPoint;
 import com.application.StockApp.analysis.dto.StockAnalysisResponse;

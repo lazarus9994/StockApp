@@ -26,7 +26,7 @@ public class FolderStockImporter {
 
     private final CsvStockParser parser;
     private final StockRepository stockRepo;
-    private final StockRecordRepository recordRepo;
+    private final StockRecordRepository recordRepository;
     private final StockMassService massService;
     private final StockFrequencyService freqService;
     private final StockAnalysisService analysisService;
@@ -60,7 +60,7 @@ public class FolderStockImporter {
                 );
 
         // If data already exists → skip import fully
-        boolean hasRecords = recordRepo.existsByStock(stock);
+        boolean hasRecords = recordRepository.existsByStock(stock);
         if (hasRecords) {
             System.out.println("⏭ Already imported: " + stockCode);
             return;
@@ -69,7 +69,7 @@ public class FolderStockImporter {
         try {
             List<StockRecord> records = parser.parseCsv(file.getAbsolutePath(), stock);
 
-            recordRepo.saveAll(records);
+            recordRepository.saveAll(records);
 
             if (IndexDetector.isLikelyIndex(records)) {
                 System.out.println("⛔ Skipping index: " + stockCode);

@@ -1,0 +1,49 @@
+.reports-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.stock-selector {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stock-selector select {
+    padding: 8px;
+    font-size: 16px;
+}
+
+.info-box {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f3f3f3;
+    border-left: 4px solid #555;
+    border-radius: 4px;
+}
+
+.news-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+}
+
+.news-card h3 {
+    margin: 0 0 5px;
+}
+
+.source-line {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 10px;
+}
+
+.news-content {
+    font-size: 15px;
+    margin-bottom: 15px;
+    white-space: pre-line;
+}

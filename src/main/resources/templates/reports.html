@@ -3,8 +3,56 @@
       th:replace="~{layout :: layout(~{::body})}">
 <body>
 
-<h1>Reports</h1>
-<p th:text="${status}"></p>
+<section class="reports-container">
 
+    <h1 class="page-title">📰 Stock News Reports</h1>
+    <p class="page-subtitle">Latest news collected from external sources</p>
+
+    <!-- STOCK SELECTOR -->
+    <form id="stockSelectForm" method="get" class="stock-selector">
+        <label for="stock">Select Stock:</label>
+        <select name="stock" id="stock" onchange="this.form.submit()">
+            <option value="">-- Choose a Stock --</option>
+            <option th:each="s : ${stocks}"
+                    th:value="${s.stockCode}"
+                    th:selected="${selectedStock != null and selectedStock == s.stockCode}"
+                    th:text="${s.stockCode}">
+            </option>
+        </select>
+    </form>
+
+    <!-- NO STOCK SELECTED -->
+    <div th:if="${selectedStock == null}" class="info-box">
+        <p>Please select a stock to view its latest news.</p>
+    </div>
+
+    <!-- NEWS LIST -->
+    <div th:if="${selectedStock != null}">
+        <h2 th:text="'News for ' + ${selectedStock}"></h2>
+
+        <div th:if="${#lists.isEmpty(news)}" class="info-box">
+            <p>No news available for this stock yet.</p>
+        </div>
+
+        <div th:each="n : ${news}" class="news-card">
+
+            <h3 th:text="${n.headline}">Headline</h3>
+
+            <p class="source-line">
+                <span th:text="${n.source}">Source</span> •
+                <span th:text="${#temporals.format(n.publishedAt, 'yyyy-MM-dd HH:mm')}">2025-01-01</span>
+            </p>
+
+            <p th:text="${n.content}" class="news-content"></p>
+
+            <a th:href="${n.url}" target="_blank" class="btn btn-primary btn-sm">
+                Read Full Article
+            </a>
+        </div>
+    </div>
+
+</section>
+
+<link rel="stylesheet" th:href="@{/css/reports.css}">
 </body>
 </html>
