@@ -1,6 +1,7 @@
 package com.application.StockApp.stock.service;
 
 import com.application.StockApp.records.repository.StockRecordRepository;
+import com.application.StockApp.stock.model.Stock;
 import com.application.StockApp.stock.repository.StockRepository;
 import com.application.StockApp.web.dto.StockRecordDto;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +63,9 @@ public class StockService {
         if (val == null) return BigDecimal.ZERO;
         if (val instanceof BigDecimal bd) return bd;
         return new BigDecimal(val.toString());
+    }
+
+    public List<String> getAllStockCodes() {
+        return stockRepository.findAll().stream().map(Stock::getStockCode).toList();
     }
 }
