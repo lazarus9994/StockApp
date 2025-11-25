@@ -1,8 +1,8 @@
-package com.application.StockApp.analysis.service;
+package com.application.StockApp.analysis.physics.service;
 
 import com.application.StockApp.analysis.dto.MassPoint;
-import com.application.StockApp.analysis.model.StockMass;
-import com.application.StockApp.analysis.repository.StockMassRepository;
+import com.application.StockApp.analysis.physics.model.StockMass;
+import com.application.StockApp.analysis.physics.repository.StockMassRepository;
 import com.application.StockApp.records.model.StockRecord;
 import com.application.StockApp.records.repository.StockRecordRepository;
 import com.application.StockApp.stock.model.Stock;
@@ -16,7 +16,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

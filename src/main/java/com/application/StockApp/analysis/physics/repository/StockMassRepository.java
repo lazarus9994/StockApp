@@ -1,4 +1,4 @@
-package com.application.StockApp.analysis.repository;
+package com.application.StockApp.analysis.physics.repository;
 
 import com.application.StockApp.analysis.model.StockMass;
 import com.application.StockApp.stock.model.Stock;

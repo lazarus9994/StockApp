@@ -1,7 +1,7 @@
-package com.application.StockApp.analysis.repository;
+package com.application.StockApp.analysis.physics.repository;
 
-import com.application.StockApp.analysis.model.StockFrequency;
-import com.application.StockApp.analysis.model.StockFrequency.PeriodType;
+import com.application.StockApp.analysis.physics.model.PeriodType;
+import com.application.StockApp.analysis.physics.model.StockFrequency;
 import com.application.StockApp.stock.model.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +24,5 @@ public interface StockFrequencyRepository extends JpaRepository<StockFrequency, 
             "WHERE f.stock.id = :stockId AND f.periodType = :type")
     Optional<BigDecimal> getAvgFrequency(@Param("stockId") UUID stockId,
                                          @Param("type") PeriodType type);
+
 }

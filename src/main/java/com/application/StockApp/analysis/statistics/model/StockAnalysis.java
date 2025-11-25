@@ -1,4 +1,4 @@
-package com.application.StockApp.analysis.model;
+package com.application.StockApp.analysis.statistics.model;
 
 import com.application.StockApp.stock.model.Stock;
 import jakarta.persistence.*;

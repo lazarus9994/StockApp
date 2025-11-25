@@ -1,5 +1,7 @@
-package com.application.StockApp.analysis.service;
+package com.application.StockApp.analysis.statistics.service;
 
+import com.application.StockApp.analysis.physics.service.StockFrequencyService;
+import com.application.StockApp.analysis.physics.service.StockMassService;
 import com.application.StockApp.stock.model.Stock;
 import com.application.StockApp.stock.repository.StockRepository;
 import jakarta.transaction.Transactional;

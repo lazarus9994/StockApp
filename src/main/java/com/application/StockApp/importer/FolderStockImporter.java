@@ -1,9 +1,9 @@
 package com.application.StockApp.importer;
 
 import com.application.StockApp.analysis.logic.IndexDetector;
-import com.application.StockApp.analysis.service.StockAnalysisService;
-import com.application.StockApp.analysis.service.StockFrequencyService;
-import com.application.StockApp.analysis.service.StockMassService;
+import com.application.StockApp.analysis.statistics.service.StockAnalysisService;
+import com.application.StockApp.analysis.physics.service.StockFrequencyService;
+import com.application.StockApp.analysis.physics.service.StockMassService;
 import com.application.StockApp.parser.CsvStockParser;
 import com.application.StockApp.records.model.StockRecord;
 import com.application.StockApp.records.repository.StockRecordRepository;

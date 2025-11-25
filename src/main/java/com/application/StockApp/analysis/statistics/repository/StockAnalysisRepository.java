@@ -1,6 +1,6 @@
-package com.application.StockApp.analysis.repository;
+package com.application.StockApp.analysis.statistics.repository;
 
-import com.application.StockApp.analysis.model.StockAnalysis;
+import com.application.StockApp.analysis.statistics.model.StockAnalysis;
 import com.application.StockApp.stock.model.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
 

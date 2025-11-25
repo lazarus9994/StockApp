@@ -1,12 +1,12 @@
 package com.application.StockApp.web;
 
-import com.application.StockApp.analysis.service.StockFrequencyService;
-import com.application.StockApp.analysis.service.StockMassService;
+import com.application.StockApp.analysis.physics.service.StockFrequencyService;
+import com.application.StockApp.analysis.physics.service.StockMassService;
 import com.application.StockApp.records.model.StockRecord;
 import com.application.StockApp.records.repository.StockRecordRepository;
 import com.application.StockApp.stock.model.Stock;
 import com.application.StockApp.stock.repository.StockRepository;
-import com.application.StockApp.analysis.model.StockFrequency.PeriodType;
+import com.application.StockApp.analysis.physics.model.StockFrequency.PeriodType;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor

@@ -1,10 +1,10 @@
-package com.application.StockApp.analysis.service;
+package com.application.StockApp.analysis.statistics.service;
 
-import com.application.StockApp.analysis.model.StockAnalysis;
-import com.application.StockApp.analysis.model.StockFrequency;
-import com.application.StockApp.analysis.repository.StockAnalysisRepository;
-import com.application.StockApp.analysis.repository.StockFrequencyRepository;
-import com.application.StockApp.analysis.repository.StockMassRepository;
+import com.application.StockApp.analysis.statistics.model.StockAnalysis;
+import com.application.StockApp.analysis.physics.model.StockFrequency;
+import com.application.StockApp.analysis.statistics.repository.StockAnalysisRepository;
+import com.application.StockApp.analysis.physics.repository.StockFrequencyRepository;
+import com.application.StockApp.analysis.physics.repository.StockMassRepository;
 import com.application.StockApp.stock.model.Stock;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

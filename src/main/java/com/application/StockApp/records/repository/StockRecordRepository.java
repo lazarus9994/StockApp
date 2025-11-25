@@ -15,6 +15,7 @@ public interface StockRecordRepository extends JpaRepository<StockRecord, UUID> 
     List<StockRecord> findAllByStockAndDateBetween(Stock stock, LocalDate startDate, LocalDate endDate);
     List<StockRecord> findAllByStockOrderByDateAsc(Stock stock);
     List<StockRecord> findAllByStockAndDateBetweenOrderByDateAsc(Stock stock, LocalDate start, LocalDate end);
+    List<StockRecord> findByStock(Stock stock);
     boolean existsByStockAndDate(Stock stock, LocalDate date);
     boolean existsByStock(Stock stock);
 
@@ -113,6 +114,5 @@ public interface StockRecordRepository extends JpaRepository<StockRecord, UUID> 
     LIMIT 1
 """)
     Double findLatestChangePercentByStock(@Param("stock") Stock stock);
-
 
 }
