@@ -1,6 +1,7 @@
 package com.application.StockApp.analysis.physics.service;
 
 import com.application.StockApp.analysis.logic.SwingDetector;
+import com.application.StockApp.analysis.mathematics.service.StockTriangleService;
 import com.application.StockApp.analysis.physics.model.PeriodType;
 import com.application.StockApp.analysis.physics.model.StockFrequency;
 import com.application.StockApp.analysis.physics.repository.StockFrequencyRepository;
@@ -23,6 +24,7 @@ public class StockFrequencyService {
 
     private final StockRecordRepository stockRecordRepository;
     private final StockFrequencyRepository frequencyRepository;
+    private final StockTriangleService triangleService;
 
     // ============================================================
     // DAILY FREQUENCY (основният слой)
@@ -34,6 +36,10 @@ public class StockFrequencyService {
 
         // 2. Извличаме всички SwingTriangle (LHL + HLH)
         List<SwingDetector.SwingTriangle> swings = SwingDetector.detectSwings(records);
+
+        // Записваме геометрията на триъгълниците
+        triangleService.buildTriangles(stock, swings);
+
 
         // 3. Създаваме записи за всеки период
         List<StockFrequency> rawDaily = new ArrayList<>();
@@ -193,5 +199,16 @@ public class StockFrequencyService {
         }
 
         return frequencyRepository.saveAll(result);
+    }
+
+    public void computeAllFrequencies(Stock stock) {
+        computeDailyFrequencies(stock);
+        computeWeeklyFrequencies(stock);
+        computeMonthlyFrequencies(stock);
+        computeYearlyFrequencies(stock);
+    }
+
+    public Object getFrequencyPoints(Stock stock, PeriodType periodType) {
+        return frequencyRepository.findAllByStockAndPeriodType(stock, periodType);
     }
 }

@@ -1,6 +1,6 @@
 package com.application.StockApp.analysis.physics.repository;
 
-import com.application.StockApp.analysis.model.StockMass;
+import com.application.StockApp.analysis.physics.model.StockMass;
 import com.application.StockApp.stock.model.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

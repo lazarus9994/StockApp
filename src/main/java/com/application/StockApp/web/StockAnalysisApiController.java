@@ -3,6 +3,7 @@ package com.application.StockApp.web;
 import com.application.StockApp.analysis.dto.FrequencyPoint;
 import com.application.StockApp.analysis.dto.MassPoint;
 import com.application.StockApp.analysis.dto.StockAnalysisResponse;
+import com.application.StockApp.analysis.physics.model.PeriodType;
 import com.application.StockApp.analysis.physics.model.StockFrequency;
 import com.application.StockApp.analysis.physics.repository.StockFrequencyRepository;
 import com.application.StockApp.analysis.physics.repository.StockMassRepository;
@@ -34,22 +35,22 @@ public class StockAnalysisApiController {
                 .map(m -> new MassPoint(m.getDate(), m.getMass()))
                 .toList();
 
-        var daily = freqRepo.findAllByStockAndPeriodType(stock, StockFrequency.PeriodType.DAILY)
+        var daily = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.DAILY)
                 .stream()
                 .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
                 .toList();
 
-        var weekly = freqRepo.findAllByStockAndPeriodType(stock, StockFrequency.PeriodType.WEEKLY)
+        var weekly = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.WEEKLY)
                 .stream()
                 .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
                 .toList();
 
-        var monthly = freqRepo.findAllByStockAndPeriodType(stock, StockFrequency.PeriodType.MONTHLY)
+        var monthly = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.MONTHLY)
                 .stream()
                 .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
                 .toList();
 
-        var yearly = freqRepo.findAllByStockAndPeriodType(stock, StockFrequency.PeriodType.YEARLY)
+        var yearly = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.YEARLY)
                 .stream()
                 .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
                 .toList();

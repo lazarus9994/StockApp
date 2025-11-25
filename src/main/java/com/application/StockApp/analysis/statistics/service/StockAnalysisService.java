@@ -1,7 +1,7 @@
 package com.application.StockApp.analysis.statistics.service;
 
 import com.application.StockApp.analysis.statistics.model.StockAnalysis;
-import com.application.StockApp.analysis.physics.model.StockFrequency;
+import com.application.StockApp.analysis.physics.model.PeriodType;
 import com.application.StockApp.analysis.statistics.repository.StockAnalysisRepository;
 import com.application.StockApp.analysis.physics.repository.StockFrequencyRepository;
 import com.application.StockApp.analysis.physics.repository.StockMassRepository;
@@ -34,19 +34,19 @@ public class StockAnalysisService {
                 massRepository.getAvgMass(stock.getId()).orElse(BigDecimal.ZERO));
 
         analysis.setAvgDailyFrequency(
-                frequencyRepository.getAvgFrequency(stock.getId(), StockFrequency.PeriodType.DAILY)
+                frequencyRepository.getAvgFrequency(stock.getId(), PeriodType.DAILY)
                         .orElse(BigDecimal.ZERO));
 
         analysis.setAvgWeeklyFrequency(
-                frequencyRepository.getAvgFrequency(stock.getId(), StockFrequency.PeriodType.WEEKLY)
+                frequencyRepository.getAvgFrequency(stock.getId(), PeriodType.WEEKLY)
                         .orElse(BigDecimal.ZERO));
 
         analysis.setAvgMonthlyFrequency(
-                frequencyRepository.getAvgFrequency(stock.getId(), StockFrequency.PeriodType.MONTHLY)
+                frequencyRepository.getAvgFrequency(stock.getId(), PeriodType.MONTHLY)
                         .orElse(BigDecimal.ZERO));
 
         analysis.setAvgYearlyFrequency(
-                frequencyRepository.getAvgFrequency(stock.getId(), StockFrequency.PeriodType.YEARLY)
+                frequencyRepository.getAvgFrequency(stock.getId(), PeriodType.YEARLY)
                         .orElse(BigDecimal.ZERO));
 
         analysisRepository.save(analysis);
