@@ -5,12 +5,14 @@ import com.application.StockApp.analysis.mathematics.model.StockTriangle;
 import com.application.StockApp.analysis.mathematics.repository.StockTriangleRepository;
 import com.application.StockApp.records.model.StockRecord;
 import com.application.StockApp.stock.model.Stock;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,6 +20,25 @@ import java.util.List;
 public class StockTriangleService {
 
     private final StockTriangleRepository triangleRepository;
+
+    @Transactional
+    public void computeTriangles(Stock stock, List<StockRecord> records) {
+
+        // 1) Изчистваме старите триъгълници за тази акция
+        triangleRepository.deleteAllByStock(stock);
+
+        // 2) Подреждаме записите по дата (за всеки случай)
+        List<StockRecord> sorted = records.stream()
+                .sorted(Comparator.comparing(StockRecord::getDate))
+                .toList();
+
+        // 3) Генерираме swing триъгълници
+        List<SwingDetector.SwingTriangle> swings =
+                SwingDetector.detectSwings(sorted);
+
+        // 4) Превръщаме ги в StockTriangle и ги записваме
+        buildTriangles(stock, swings);
+    }
 
     public void buildTriangles(Stock stock, List<SwingDetector.SwingTriangle> swings) {
 
@@ -82,4 +103,5 @@ public class StockTriangleService {
         return BigDecimal.valueOf(Math.toDegrees(angle))
                 .setScale(6, RoundingMode.HALF_UP);
     }
+
 }

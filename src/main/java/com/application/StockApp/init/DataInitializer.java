@@ -1,5 +1,6 @@
 package com.application.StockApp.init;
 
+import com.application.StockApp.analysis.statistics.service.StockAnalysisBatchService;
 import com.application.StockApp.importer.FolderStockImporter;
 import com.application.StockApp.records.repository.StockRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,17 +14,23 @@ public class DataInitializer {
 
     private final FolderStockImporter importer;
     private final StockRecordRepository recordRepository;
+    private final StockAnalysisBatchService batchService;
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
 
         long count = recordRepository.count();
-        if (count > 0) {
+        if (count == 0) {
             System.out.println("⏭ Stock records already loaded (" + count + ")");
             return;
         }
 
         System.out.println("🚀 Starting initial CSV import...");
         importer.importAll();
+
+        System.out.println("📊 Running full analysis rebuild...");
+        batchService.rebuildAll();
+
+        System.out.println("✅ Initial analysis completed.");
     }
 }

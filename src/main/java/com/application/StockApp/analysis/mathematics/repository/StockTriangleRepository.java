@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface StockTriangleRepository extends JpaRepository<StockTriangle, UUID> {
 
     List<StockTriangle> findAllByStock(Stock stock);
+    void deleteAllByStock(Stock stock);
 
 }

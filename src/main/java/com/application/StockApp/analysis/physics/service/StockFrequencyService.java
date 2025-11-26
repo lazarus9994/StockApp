@@ -202,6 +202,9 @@ public class StockFrequencyService {
     }
 
     public void computeAllFrequencies(Stock stock) {
+
+        frequencyRepository.deleteAllByStock(stock);
+
         computeDailyFrequencies(stock);
         computeWeeklyFrequencies(stock);
         computeMonthlyFrequencies(stock);

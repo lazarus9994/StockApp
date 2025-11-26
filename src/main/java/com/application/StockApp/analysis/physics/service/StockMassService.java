@@ -30,8 +30,6 @@ public class StockMassService {
     @Transactional
     public void computeMasses(Stock stock) {
 
-        // чистим старите маси (ако преизчисляваме)
-        massRepository.deleteAllByStock(stock);
 
         List<StockRecord> records = recordRepository.findAllByStock(stock)
                 .stream()
