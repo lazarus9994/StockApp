@@ -1,5 +1,6 @@
 package com.application.StockApp.analysis.statistics.service;
 
+import com.application.StockApp.analysis.mathematics.service.StockDeltaService;
 import com.application.StockApp.analysis.mathematics.repository.StockTriangleRepository;
 import com.application.StockApp.analysis.physics.repository.StockFrequencyRepository;
 import com.application.StockApp.analysis.physics.repository.StockMassRepository;
@@ -17,6 +18,7 @@ public class StockAnalysisBatchService {
 
     private final StockRepository stockRepository;
     private final StockMassService massService;
+    private final StockDeltaService deltaService;     // <-- добавено
     private final StockFrequencyService frequencyService;
     private final StockAnalysisService analysisService;
 
@@ -25,7 +27,7 @@ public class StockAnalysisBatchService {
     private final StockMassRepository massRepository;
 
     /**
-     * Пълно изчистване на derived данните (mass / frequency / triangles)
+     * Пълно изчистване на derived данните
      * и пресмятане наново за всички акции.
      */
     @Transactional
@@ -35,6 +37,8 @@ public class StockAnalysisBatchService {
         triangleRepository.deleteAll();
         frequencyRepository.deleteAll();
         massRepository.deleteAll();
+        // При желание можем да изчистваме и delta таблицата тук
+        // deltaRepository.deleteAll();
 
         System.out.println("📊 Rebuilding analysis for all stocks...");
 
@@ -49,11 +53,6 @@ public class StockAnalysisBatchService {
         System.out.println("✅ Rebuild finished for all stocks.");
     }
 
-    /**
-     * Старото поведение – пуска анализ без да чисти БД.
-     * Можеш да го оставиш за бекграунд re-run,
-     * или да го махнеш ако не го ползваш.
-     */
     @Transactional
     public void analyzeAllStocksHistory() {
         stockRepository.findAll().forEach(stock -> {
@@ -66,9 +65,19 @@ public class StockAnalysisBatchService {
     }
 
     private void analyzeSafe(Stock stock) {
-        massService.computeMasses(stock);              // масите се смятат по StockRecord
-        frequencyService.computeAllFrequencies(stock); // вътре се вика SwingDetector + triangleService.buildTriangles(...)
-        analysisService.buildSummary(stock);           // ако още ти трябва summary
+
+        // 1) Масите по StockRecord
+        massService.computeMasses(stock);
+
+        // 2) Делтите по StockRecord
+        deltaService.computePriceDeltas(stock);
+
+        // 3) Честоти и триъгълници
+        frequencyService.computeAllFrequencies(stock);
+
+        // 4) Summary (ако го ползваш)
+        analysisService.buildSummary(stock);
+
         System.out.println("✅ Full analysis done for " + stock.getStockCode());
     }
 }

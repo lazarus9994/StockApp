@@ -1,5 +1,6 @@
 package com.application.StockApp.analysis.physics.repository;
 
+import com.application.StockApp.analysis.physics.model.PeriodType;
 import com.application.StockApp.analysis.physics.model.StockMass;
 import com.application.StockApp.stock.model.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,16 @@ public interface StockMassRepository extends JpaRepository<StockMass, UUID> {
     @Query("SELECT AVG(m.mass) FROM StockMass m WHERE m.stock.id = :stockId")
     Optional<BigDecimal> getAvgMass(@Param("stockId") UUID stockId);
 
+    // 🔽 НОВИ МЕТОДИ ЗА АГРЕГИРАНИ ПЕРИОДИ 🔽
+
+    List<StockMass> findAllByStockAndPeriodTypeOrderByPeriodStartAsc(
+            Stock stock,
+            PeriodType periodType
+    );
+
+    Optional<StockMass> findByStockAndPeriodTypeAndPeriodStart(
+            Stock stock,
+            PeriodType periodType,
+            LocalDate periodStart
+    );
 }

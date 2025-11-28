@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,11 +19,15 @@ public interface StockFrequencyRepository extends JpaRepository<StockFrequency, 
 
     List<StockFrequency> findAllByStockAndPeriodType(Stock stock, PeriodType type);
 
+    Optional<StockFrequency> findByStockAndPeriodTypeAndPeriodStart(Stock stock, PeriodType periodType, LocalDate periodStart);
+
+    List<StockFrequency> findAllByStockAndPeriodTypeOrderByPeriodStartAsc(Stock stock, PeriodType periodType);
+
     void deleteAllByStock(Stock stock);
 
-    @Query("SELECT AVG(f.frequency) FROM StockFrequency f " +
-            "WHERE f.stock.id = :stockId AND f.periodType = :type")
-    Optional<BigDecimal> getAvgFrequency(@Param("stockId") UUID stockId,
-                                         @Param("type") PeriodType type);
+    @Query("SELECT AVG(f.frequencyValue) FROM StockFrequency f WHERE f.stock.id = :stockId AND f.periodType = :type")
+    Optional<BigDecimal> getAvgFrequency(UUID stockId, PeriodType type);
+
+
 
 }

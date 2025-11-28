@@ -4,7 +4,6 @@ import com.application.StockApp.analysis.dto.FrequencyPoint;
 import com.application.StockApp.analysis.dto.MassPoint;
 import com.application.StockApp.analysis.dto.StockAnalysisResponse;
 import com.application.StockApp.analysis.physics.model.PeriodType;
-import com.application.StockApp.analysis.physics.model.StockFrequency;
 import com.application.StockApp.analysis.physics.repository.StockFrequencyRepository;
 import com.application.StockApp.analysis.physics.repository.StockMassRepository;
 import com.application.StockApp.stock.model.Stock;
@@ -30,34 +29,46 @@ public class StockAnalysisApiController {
         Stock stock = stockRepository.findByStockCodeIgnoreCase(code)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown stock: " + code));
 
-        var masses = massRepo.findAllByStock(stock)
-                .stream()
+        // --- Масите: взимаме само НЕагрегирани маси (дневни) ---
+        var masses = massRepo.findAllByStockOrderByDateAsc(stock).stream()
+                .filter(m -> !Boolean.TRUE.equals(m.getAggregated())) // само дневни маси
                 .map(m -> new MassPoint(m.getDate(), m.getMass()))
                 .toList();
 
-        var daily = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.DAILY)
-                .stream()
-                .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
-                .toList();
-
+        // --- Седмични честоти ---
         var weekly = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.WEEKLY)
                 .stream()
-                .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
+                .sorted((a, b) -> a.getPeriodStart().compareTo(b.getPeriodStart()))
+                .map(f -> new FrequencyPoint(
+                        f.getPeriodStart(),
+                        f.getFrequencyValue()
+                ))
                 .toList();
 
+        // --- Месечни честоти ---
         var monthly = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.MONTHLY)
                 .stream()
-                .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
+                .sorted((a, b) -> a.getPeriodStart().compareTo(b.getPeriodStart()))
+                .map(f -> new FrequencyPoint(
+                        f.getPeriodStart(),
+                        f.getFrequencyValue()
+                ))
                 .toList();
 
+        // --- Годишни честоти ---
         var yearly = freqRepo.findAllByStockAndPeriodType(stock, PeriodType.YEARLY)
                 .stream()
-                .map(f -> new FrequencyPoint(f.getDate(), f.getFrequency()))
+                .sorted((a, b) -> a.getPeriodStart().compareTo(b.getPeriodStart()))
+                .map(f -> new FrequencyPoint(
+                        f.getPeriodStart(),
+                        f.getFrequencyValue()
+                ))
                 .toList();
 
+        // --- DAILY честоти вече НЯМА ---
         return new StockAnalysisResponse(
                 masses,
-                daily,
+                null,   // daily
                 weekly,
                 monthly,
                 yearly

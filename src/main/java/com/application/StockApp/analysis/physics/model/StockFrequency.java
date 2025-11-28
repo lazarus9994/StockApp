@@ -1,21 +1,26 @@
 package com.application.StockApp.analysis.physics.model;
 
+import com.application.StockApp.analysis.physics.model.PeriodType;
 import com.application.StockApp.stock.model.Stock;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "stock_frequency")
+@Table(
+        name = "stock_frequency",
+        indexes = {
+                @Index(name = "idx_stock_freq_stock_period", columnList = "stock_id, period_type, period_start")
+        }
+)
 public class StockFrequency {
 
     @Id
@@ -26,31 +31,23 @@ public class StockFrequency {
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
 
-    // Датата на средната точка (връх или дъно), както решихме
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
-
     @Enumerated(EnumType.STRING)
-    private PeriodType periodType;
+    @Column(name = "period_type", nullable = false)
+    private PeriodType periodType;  // WEEKLY / MONTHLY / YEARLY
 
-    // Честота за този ден (броят осцилации за деня)
-    @Column(precision = 19, scale = 6)
-    private BigDecimal frequency;
+    @Column(name = "period_start", nullable = false)
+    private LocalDate periodStart;
 
-    // =======================================
-    // Нови полета за същинския swing-период:
-    // =======================================
+    @Column(name = "period_end", nullable = false)
+    private LocalDate periodEnd;
 
-    // Продължителност на периода (T)
-    @Column(precision = 19, scale = 6)
-    private BigDecimal periodDays;
+    @Column(name = "cycle_count", nullable = false)
+    private int cycleCount;
 
-    // Амплитуда (височина към основата на триъгълника)
-    @Column(precision = 19, scale = 6)
-    private BigDecimal amplitude;
+    @Column(name = "frequency_value", precision = 20, scale = 6)
+    private BigDecimal frequencyValue;
 
-    // Тип на pattern-а: "LHL" или "HLH"
-    @Column(length = 10)
-    private String patternType;
+    // 🔥 ново поле – маса за периода
+    @Column(name = "mass", precision = 20, scale = 6)
+    private BigDecimal mass;
 }

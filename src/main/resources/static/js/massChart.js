@@ -1,5 +1,5 @@
 // =============================================================
-//  MASS CHART – FULL HISTORY + FETCH ON ZOOM
+//  MASS CHART – FULL HISTORY + FETCH ON ZOOM + SYNC SLAVE
 // =============================================================
 
 console.log("🔥 massChart.js loaded");
@@ -9,7 +9,6 @@ let massStockCode = null;
 
 let lastMassFetchMin = null;
 let lastMassFetchMax = null;
-
 
 // ------------------------------------------------------------
 // DOM READY
@@ -22,9 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!massStockCode) return;
 
     fetchMassData("1900-01-01", "2100-01-01")
-        .then(({ labels, values }) => initMassChart(canvas, labels, values));
+        .then(({ labels, values }) => {
+            if (!labels.length) {
+                console.warn("massChart: no data");
+                return;
+            }
+            initMassChart(canvas, labels, values);
+        })
+        .catch(err => console.error("mass init error:", err));
 });
-
 
 // ------------------------------------------------------------
 // FETCH MASS DATA
@@ -34,6 +39,11 @@ async function fetchMassData(from, to) {
     console.log("🌐 mass fetch:", url);
 
     const res = await fetch(url);
+    if (!res.ok) {
+        console.error("❌ mass HTTP:", res.status);
+        return { labels: [], values: [] };
+    }
+
     const data = await res.json();
 
     return {
@@ -41,7 +51,6 @@ async function fetchMassData(from, to) {
         values: data.map(r => Number(r.mass))
     };
 }
-
 
 // ------------------------------------------------------------
 // INIT MASS CHART
@@ -52,7 +61,7 @@ function initMassChart(canvas, labels, values) {
 
     const minY = Math.min(...values);
     const maxY = Math.max(...values);
-    const padding = (maxY - minY) * 0.1 || 1;
+    const padding = ((maxY - minY) || 1) * 0.1;
 
     massChart = new Chart(ctx, {
         type: "line",
@@ -101,11 +110,40 @@ function initMassChart(canvas, labels, values) {
     });
 
     console.log("✅ massChart initialized:", labels.length, "points");
+
+    // 🔗 регистрираме слушател за синхронизация от priceChart
+    window.addEventListener("syncRangeFromPrice", async (e) => {
+        const { from, to } = e.detail || {};
+        if (!from || !to) return;
+
+        // ако вече сме на този диапазон → skip
+        if (from === lastMassFetchMin && to === lastMassFetchMax) return;
+
+        lastMassFetchMin = from;
+        lastMassFetchMax = to;
+
+        const { labels: newLabels, values: newValues } = await fetchMassData(from, to);
+        if (!newLabels.length) {
+            console.warn("mass sync: no data");
+            return;
+        }
+
+        const minY2 = Math.min(...newValues);
+        const maxY2 = Math.max(...newValues);
+        const pad2 = ((maxY2 - minY2) || 1) * 0.1;
+
+        massChart.data.labels = newLabels;
+        massChart.data.datasets[0].data = newValues;
+
+        massChart.options.scales.y.min = minY2 - pad2;
+        massChart.options.scales.y.max = maxY2 + pad2;
+
+        massChart.update("none");
+    });
 }
 
-
 // ------------------------------------------------------------
-// MASS – ZOOM HANDLER
+// MASS – ZOOM HANDLER (самостоятелно движение)
 // ------------------------------------------------------------
 async function handleMassZoom(chart) {
 
@@ -122,9 +160,20 @@ async function handleMassZoom(chart) {
     lastMassFetchMax = to;
 
     const { labels, values } = await fetchMassData(from, to);
+    if (!labels.length) {
+        console.warn("mass zoom: no data");
+        return;
+    }
+
+    const minY = Math.min(...values);
+    const maxY = Math.max(...values);
+    const padding = ((maxY - minY) || 1) * 0.1;
 
     chart.data.labels = labels;
     chart.data.datasets[0].data = values;
+
+    chart.options.scales.y.min = minY - padding;
+    chart.options.scales.y.max = maxY + padding;
 
     chart.update("none");
 }

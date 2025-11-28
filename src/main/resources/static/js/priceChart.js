@@ -1,5 +1,5 @@
 // =============================================================
-//  PRICE CHART – FULL HISTORY + FETCH ON ZOOM
+//  PRICE CHART – FULL HISTORY + FETCH ON ZOOM + SYNC MASTER
 // =============================================================
 
 console.log("🔥 priceChart.js loaded");
@@ -23,10 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load full history
     fetchAndUpdate("1900-01-01", "2100-01-01")
         .then(({ labels, values }) => {
+            if (!labels.length) {
+                console.warn("priceChart: no data");
+                return;
+            }
             initChart(canvas, labels, values);
-        });
+        })
+        .catch(err => console.error("priceChart init error:", err));
 });
-
 
 // ------------------------------------------------------------
 // FETCH DATA FOR A TIME RANGE
@@ -34,11 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchAndUpdate(from, to) {
 
     const url = `/api/stocks/${stockCode}/records-window?from=${from}&to=${to}`;
-    console.log("🌐 Fetch:", url);
+    console.log("🌐 price fetch:", url);
 
     const res = await fetch(url);
     if (!res.ok) {
-        console.error("❌ HTTP error", res.status);
+        console.error("❌ price HTTP error", res.status);
         return { labels: [], values: [] };
     }
 
@@ -47,11 +51,9 @@ async function fetchAndUpdate(from, to) {
     const labels = data.map(r => new Date(r.date + "T00:00:00"));
     const values = data.map(r => Number(r.close));
 
-    console.log(`📦 Received ${labels.length} points`);
-
+    console.log(`📦 price: ${labels.length} points`);
     return { labels, values };
 }
-
 
 // ------------------------------------------------------------
 // INITIALIZE CHART
@@ -63,7 +65,7 @@ function initChart(canvas, labels, values) {
     priceChart = new Chart(ctx, {
         type: "line",
         data: {
-            labels: labels,
+            labels,
             datasets: [{
                 label: stockCode + " Close Price",
                 data: values,
@@ -90,14 +92,14 @@ function initChart(canvas, labels, values) {
                         pinch: { enabled: true },
                         mode: "x",
                         onZoomComplete({ chart }) {
-                            handleZoom(chart);
+                            handlePriceZoom(chart);
                         }
                     },
                     pan: {
                         enabled: true,
                         mode: "x",
                         onPanComplete({ chart }) {
-                            handleZoom(chart);
+                            handlePriceZoom(chart);
                         }
                     }
                 }
@@ -105,44 +107,44 @@ function initChart(canvas, labels, values) {
         }
     });
 
-    console.log("✅ Chart initialized with", labels.length, "points");
+    console.log("✅ priceChart initialized with", labels.length, "points");
 }
 
-
 // ------------------------------------------------------------
-// HANDLE ZOOM / PAN (FETCH NEW DATA)
+// HANDLE ZOOM / PAN (FETCH NEW DATA + BROADCAST RANGE)
 // ------------------------------------------------------------
-async function handleZoom(chart) {
+async function handlePriceZoom(chart) {
 
     const axis = chart.scales.x;
-
     const minDate = new Date(axis.min);
     const maxDate = new Date(axis.max);
 
     const from = minDate.toISOString().slice(0, 10);
     const to   = maxDate.toISOString().slice(0, 10);
 
-    console.log("🔍 Zoomed range:", from, "→", to);
+    console.log("🔍 price zoomed range:", from, "→", to);
 
-    // avoid infinite loops (zoom events fire repeatedly)
+    // avoid duplicate fetch
     if (lastFetchMin === from && lastFetchMax === to) {
-        console.log("⏳ Skip fetch (same range)");
+        console.log("⏳ price: skip fetch (same range)");
         return;
     }
 
     lastFetchMin = from;
     lastFetchMax = to;
 
-    // fetch updated data
     const { labels, values } = await fetchAndUpdate(from, to);
-
-    if (labels.length === 0) {
-        console.warn("⚠ No data in this range");
+    if (!labels.length) {
+        console.warn("⚠ price: no data in this range");
         return;
     }
 
-    // update chart smoothly
     chart.data.labels = labels;
     chart.data.datasets[0].data = values;
     chart.update("none");
+
+    // 🔔 СИНХРО ЗА ОСТАНАЛИТЕ ГРАФИКИ
+    window.dispatchEvent(new CustomEvent("syncRangeFromPrice", {
+        detail: { from, to }
+    }));
 }
