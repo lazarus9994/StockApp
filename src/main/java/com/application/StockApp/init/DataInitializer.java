@@ -20,17 +20,18 @@ public class DataInitializer {
     public void init() {
 
         long count = recordRepository.count();
-        if (count == 0) {
-            System.out.println("⏭ Stock records already loaded (" + count + ")");
-            return;
-        }
 
-        System.out.println("🚀 Starting initial CSV import...");
-        importer.importAll();
+        if (count == 0) {
+            System.out.println("🚀 No records found, importing CSV...");
+            importer.importAll();
+        } else {
+            System.out.println("⏭ Found " + count + " stock records.");
+        }
 
         System.out.println("📊 Running full analysis rebuild...");
         batchService.rebuildAll();
 
         System.out.println("✅ Initial analysis completed.");
     }
+
 }

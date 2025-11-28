@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ public interface StockRecordRepository extends JpaRepository<StockRecord, UUID> 
     List<StockRecord> findAllByStockAndDateBetween(Stock stock, LocalDate startDate, LocalDate endDate);
     List<StockRecord> findAllByStockOrderByDateAsc(Stock stock);
     List<StockRecord> findAllByStockAndDateBetweenOrderByDateAsc(Stock stock, LocalDate start, LocalDate end);
+    List<StockRecord> findAllByStockAndDateBetweenOrderByDate(Stock stock, LocalDate from, LocalDate to);
     List<StockRecord> findByStock(Stock stock);
     boolean existsByStockAndDate(Stock stock, LocalDate date);
     boolean existsByStock(Stock stock);

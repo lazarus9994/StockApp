@@ -4,18 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title th:text="${pageTitle} ?: 'StockApp'">StockApp</title>
+
+    <!-- Първо базовите/light стилове -->
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <!-- Накрая тъмната тема, за да override-не горните -->
     <link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
+
 <body th:with="path=${currentPath} ?: '/'"
       th:class="${#strings.startsWith(path,'/login') or #strings.startsWith(path,'/register') ? 'auth-page' : 'app-layout'}">
 
-
 <div class="app-container">
 
-    <!-- === Sidebar === -->
+    <!-- Sidebar (скрит на login/register) -->
     <aside class="sidebar"
-           th:if="${currentPath == null or (!#strings.startsWith(currentPath ?: '', '/login') and !#strings.startsWith(currentPath ?: '', '/register'))}">
+           th:if="${!#strings.startsWith(path,'/login') and !#strings.startsWith(path,'/register')}">
+
         <div class="logo-section">
             <span class="logo">💹</span>
             <h2>StockApp</h2>
@@ -24,56 +31,52 @@
         <nav class="nav-links">
 
             <a th:href="@{/}" class="nav-item"
-               th:classappend="${currentPath != null and currentPath == '/'} ? ' active'">
+               th:classappend="${path == '/'} ? ' active'">
                 <i>🏠</i><span>Dashboard</span>
             </a>
 
             <a th:href="@{/stocks}" class="nav-item"
-               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/stocks')} ? ' active'">
+               th:classappend="${#strings.startsWith(path,'/stocks')} ? ' active'">
                 <i>📈</i><span>Stocks</span>
             </a>
 
             <a th:href="@{/analytics}" class="nav-item"
-               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/analytics')} ? ' active'">
+               th:classappend="${#strings.startsWith(path,'/analytics')} ? ' active'">
                 <i>📊</i><span>Analytics</span>
             </a>
 
             <a th:href="@{/profile}" class="nav-item"
-               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/profile')} ? ' active'">
+               th:classappend="${#strings.startsWith(path,'/profile')} ? ' active'">
                 <i>👤</i><span>Profile</span>
             </a>
 
-            <!-- Upload CSV -->
             <a th:href="@{/upload}" class="nav-item"
-               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/upload')} ? ' active'">
+               th:classappend="${#strings.startsWith(path,'/upload')} ? ' active'">
                 <i>📤</i><span>Upload CSV</span>
             </a>
 
-            <!-- Import Logs -->
             <a th:href="@{/imports}" class="nav-item"
-               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/imports')} ? ' active'">
+               th:classappend="${#strings.startsWith(path,'/imports')} ? ' active'">
                 <i>📁</i><span>Import Logs</span>
             </a>
 
-            <!-- Reports -->
             <a th:href="@{/reports}" class="nav-item"
-               th:classappend="${currentPath != null and #strings.startsWith(currentPath, '/reports')} ? ' active'">
+               th:classappend="${#strings.startsWith(path,'/reports')} ? ' active'">
                 <i>📜</i><span>Reports</span>
             </a>
 
-            <!-- Logout -->
             <a th:href="@{/logout}" class="nav-item">
                 <i>🚪</i><span>Logout</span>
             </a>
 
         </nav>
-
     </aside>
 
-    <!-- === Main content area === -->
+    <!-- Main content -->
     <main class="main-content">
         <th:block th:replace="${content}"></th:block>
     </main>
+
 </div>
 
 </body>

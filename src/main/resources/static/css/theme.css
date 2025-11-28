@@ -126,7 +126,8 @@ body {
 
 canvas {
   width: 100% !important;
-  max-height: 400px;
+  height: 300px !important;
+  background-color: #161b22;
 }
 
 /* === BUTTONS === */

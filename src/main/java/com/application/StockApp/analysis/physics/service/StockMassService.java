@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +77,17 @@ public class StockMassService {
         return massRepository.findAllByStock(stock)
                 .stream()
                 .map(m -> new MassPoint(m.getDate(), m.getMass()))
+                .toList();
+    }
+
+    public List<Map<String, Object>> getMassWindow(Stock stock, LocalDate from, LocalDate to) {
+
+        return getMassPoints(stock).stream()
+                .filter(p -> !p.date().isBefore(from) && !p.date().isAfter(to))
+                .map(p -> Map.<String, Object>of(
+                        "date", p.date().toString(),
+                        "mass", p.mass()
+                ))
                 .toList();
     }
 

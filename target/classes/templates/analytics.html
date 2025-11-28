@@ -22,44 +22,51 @@
 
         <h2 th:text="'Analytics for ' + ${stock.stockCode}"></h2>
 
+        <!-- ===== PRICE ===== -->
         <h3>Price</h3>
-        <canvas id="priceChart"></canvas>
+        <canvas id="priceChart"
+                th:attr="data-code=${stock.stockCode}"
+                style="width:100%; height:350px;"></canvas>
 
+        <!-- ===== MASS ===== -->
         <h3>Mass</h3>
-        <canvas id="massChart"></canvas>
+        <canvas id="massChart"
+                th:attr="data-code=${stock.stockCode}"
+                style="width:100%; height:300px;"></canvas>
 
+        <!-- ===== FREQUENCY ===== -->
         <h3>Daily Frequency</h3>
-        <canvas id="dailyChart"></canvas>
+        <canvas id="dailyChart"
+                th:attr="data-code=${stock.stockCode}"
+                style="width:100%; height:250px;"></canvas>
 
         <h3>Weekly Frequency</h3>
-        <canvas id="weeklyChart"></canvas>
+        <canvas id="weeklyChart"
+                th:attr="data-code=${stock.stockCode}"
+                style="width:100%; height:250px;"></canvas>
 
         <h3>Monthly Frequency</h3>
-        <canvas id="monthlyChart"></canvas>
+        <canvas id="monthlyChart"
+                th:attr="data-code=${stock.stockCode}"
+                style="width:100%; height:250px;"></canvas>
 
         <h3>Yearly Frequency</h3>
-        <canvas id="yearlyChart"></canvas>
-
-        <script th:inline="javascript">
-            const dates = /*[[${dates}]]*/ [];
-            const closes = /*[[${closes}]]*/ [];
-
-            const massDates = /*[[${massDates}]]*/ [];
-            const massValues = /*[[${massValues}]]*/ [];
-
-            const daily = /*[[${daily}]]*/ [];
-            const weekly = /*[[${weekly}]]*/ [];
-            const monthly = /*[[${monthly}]]*/ [];
-            const yearly = /*[[${yearly}]]*/ [];
-        </script>
-
-
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-        <script src="/js/analytics.js"></script>
+        <canvas id="yearlyChart"
+                th:attr="data-code=${stock.stockCode}"
+                style="width:100%; height:250px;"></canvas>
 
     </div>
 
-</content>
+    <!-- Chart libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
 
+    <!-- Our scripts -->
+    <script src="/js/priceChart.js"></script>
+    <script src="/js/massChart.js"></script>
+    <script src="/js/frequencyCharts.js"></script>
+
+</content>
 </html>
