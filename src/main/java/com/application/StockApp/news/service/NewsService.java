@@ -2,7 +2,7 @@ package com.application.StockApp.news.service;
 
 import com.application.StockApp.news.model.News;
 import com.application.StockApp.news.repository.NewsRepository;
-import com.application.StockApp.web.dto.NewsDto;
+import com.application.StockApp.news.web.dto.NewsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +40,9 @@ public class NewsService {
 
     public List<News> getByStock(String stockCode) {
         return newsRepository.findByStockCodeOrderByPublishedAtDesc(stockCode);
+    }
+
+    public List<News> getLatestNews() {
+        return newsRepository.findAll().subList(0, 10);
     }
 }

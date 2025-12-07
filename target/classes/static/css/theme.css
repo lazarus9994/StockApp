@@ -25,16 +25,16 @@ body {
   overflow: hidden;
 }
 
-/* === APP CONTAINER (за всички страници с layout) === */
+/* === APP CONTAINER (layout pages) === */
 .app-container {
   display: grid;
-  grid-template-columns: 240px 1fr; /* sidebar + content */
+  grid-template-columns: 240px 1fr;
   height: 100vh;
 }
 
 /* === SIDEBAR === */
 .sidebar {
-  background-color: #161b22;
+  background-color: var(--bg-card);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -52,11 +52,6 @@ body {
 
 .logo-section .logo {
   font-size: 28px;
-}
-
-.logo-section h2 {
-  font-size: 20px;
-  margin: 0;
 }
 
 .nav-links {
@@ -86,7 +81,7 @@ body {
   color: #fff;
 }
 
-/* === MAIN CONTENT (dashboard, stocks, analytics и т.н.) === */
+/* === MAIN CONTENT === */
 .main-content {
   background-color: var(--bg);
   padding: 40px;
@@ -153,17 +148,18 @@ canvas {
 .main-content::-webkit-scrollbar {
   width: 10px;
 }
-
 .main-content::-webkit-scrollbar-thumb {
   background: #30363d;
   border-radius: 5px;
 }
-
 .main-content::-webkit-scrollbar-thumb:hover {
   background: #484f58;
 }
 
-/* === AUTH PAGES (login / register) === */
+/* =====================================================
+   === AUTH PAGES (LOGIN & REGISTER) ===
+   ===================================================== */
+
 body.auth-page {
   display: flex;
   justify-content: center;
@@ -199,8 +195,33 @@ body.auth-page .card {
   background-color: var(--bg-card);
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   color: var(--text);
+}
+
+/* === LOGIN/REGISTER INPUT STYLING === */
+.auth-page input[type="text"],
+.auth-page input[type="email"],
+.auth-page input[type="password"],
+.auth-page input[type="date"],
+.auth-page select {
+  width: 100%;
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #374151 !important;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  transition: border 0.2s;
+}
+
+.auth-page input:focus {
+  border-color: var(--accent) !important;
+  outline: none;
+}
+
+.auth-page input::placeholder {
+  color: #9ca3af !important;
 }
 
 /* === RESPONSIVE === */
@@ -223,25 +244,18 @@ body.auth-page .card {
   }
 }
 
+/* === WATCHLIST TABLE === */
 .watchlist-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.watchlist-table th, .watchlist-table td {
-    padding: 8px 12px;
-    border-bottom: 1px solid #30363d;
-}
-
-.btn {
-    background: #58a6ff;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
+.watchlist-table th,
+.watchlist-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .btn.danger {
-    background: #d73a49;
+  background: var(--danger);
 }

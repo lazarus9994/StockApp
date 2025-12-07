@@ -1,25 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en"
       th:fragment="layout(content)">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title th:text="${pageTitle} ?: 'StockApp'">StockApp</title>
 
-    <!-- Първо базовите/light стилове -->
+    <!-- Styles -->
     <link rel="stylesheet" th:href="@{/css/layout.css}">
     <link rel="stylesheet" th:href="@{/css/components.css}">
-    <!-- Накрая тъмната тема, за да override-не горните -->
     <link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 
 <body th:with="path=${currentPath} ?: '/'"
-      th:class="${#strings.startsWith(path,'/login') or #strings.startsWith(path,'/register') ? 'auth-page' : 'app-layout'}">
+      th:class="${#strings.startsWith(path,'/login') or #strings.startsWith(path,'/register')
+                ? 'auth-page' : 'app-layout'}">
 
 <div class="app-container">
 
-    <!-- Sidebar (скрит на login/register) -->
+    <!-- Sidebar (скрит при login/register) -->
     <aside class="sidebar"
            th:if="${!#strings.startsWith(path,'/login') and !#strings.startsWith(path,'/register')}">
 

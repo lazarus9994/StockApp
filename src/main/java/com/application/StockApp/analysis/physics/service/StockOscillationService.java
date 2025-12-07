@@ -126,4 +126,28 @@ public class StockOscillationService {
             oscillationRepository.save(osc);
         }
     }
+
+    // --------- Пълни данни за осцилациите (за графика) ---------
+    public List<Map<String, Object>> getOscillationData(Stock stock) {
+
+        return oscillationRepository.findAllByStockOrderByDateAsc(stock).stream()
+                .map(o -> Map.<String, Object>of(
+                        "date", o.getDate().toString(),
+                        "realFrequency", o.getRealFrequency(),
+                        "theoreticalFrequency", o.getTheoreticalFrequency(),
+                        "kEffective", o.getKEffective(),
+                        "deviation", o.getDeviation()
+                ))
+                .toList();
+    }
+
+    public List<Map<String, Object>> getOscillationWindow(Stock stock, LocalDate from, LocalDate to) {
+
+        return getOscillationData(stock).stream()
+                .filter(o -> {
+                    LocalDate d = LocalDate.parse(o.get("date").toString());
+                    return !d.isBefore(from) && !d.isAfter(to);
+                })
+                .toList();
+    }
 }

@@ -11,5 +11,6 @@ public interface StockOscillationRepository extends JpaRepository<StockOscillati
 
     List<StockOscillation> findAllByStockOrderByDateAsc(Stock stock);
 
+
     void deleteAllByStock(Stock stock);
 }

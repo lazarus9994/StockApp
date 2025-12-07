@@ -1,91 +1,153 @@
 package com.application.StockApp.web;
 
-import com.application.StockApp.analysis.physics.service.StockFrequencyService;
-import com.application.StockApp.analysis.physics.service.StockMassService;
-import com.application.StockApp.records.model.StockRecord;
+import com.application.StockApp.analysis.mathematics.service.StockDeltaService;
+import com.application.StockApp.analysis.physics.model.PeriodType;
+import com.application.StockApp.analysis.physics.service.*;
 import com.application.StockApp.records.repository.StockRecordRepository;
 import com.application.StockApp.stock.model.Stock;
 import com.application.StockApp.stock.repository.StockRepository;
-import com.application.StockApp.analysis.physics.model.PeriodType;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @Controller
+@RequestMapping("/analytics")
 @RequiredArgsConstructor
 public class AnalyticsController {
 
-    private final StockRepository stockRepository;
-    private final StockRecordRepository recordRepository;
-    private final StockMassService stockMassService;
-    private final StockFrequencyService  stockFrequencyService;
+    private final StockRepository stockRepo;
+    private final StockRecordRepository recordRepo;
 
+    private final StockMassService massService;
+    private final StockFrequencyService frequencyService;
+    private final StockDeltaService deltaService;
+    private final StockKineticsService kineticsService;
+    private final StockOscillationService oscillationService;
 
+    @GetMapping
+    public String analyticsPage(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            Model model
+    ) {
+        List<Stock> stocks = stockRepo.findAll();
+        model.addAttribute("stocks", stocks);
 
-    @GetMapping("/analytics")
-    public String analytics(Model model) {
-        model.addAttribute("stocks", stockRepository.findAll());
+        if (code == null && !stocks.isEmpty()) {
+            code = stocks.get(0).getStockCode();
+        }
+
+        Stock stock = stockRepo.findByStockCode(code).orElse(null);
+        model.addAttribute("selectedCode", code);
+
+        if (from == null) from = LocalDate.now().minusYears(1);
+        if (to == null) to = LocalDate.now();
+
+        model.addAttribute("fromDate", from);
+        model.addAttribute("toDate", to);
+
         return "analytics";
     }
 
-    @GetMapping("/analytics/{code}")
-    public String analyticsForStock(@PathVariable String code, Model model) {
+    private Stock getStock(String code) {
+        return stockRepo.findByStockCodeIgnoreCase(code)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown stock: " + code));
+    }
 
-        Stock stock = stockRepository.findByStockCodeIgnoreCase(code)
-                .orElseThrow(() -> new RuntimeException("Stock not found: " + code));
+    // -------------------------------
+    // PRICE WINDOW (close prices)
+    // -------------------------------
+    @GetMapping("/api/{code}/price-window")
+    @ResponseBody
+    public ResponseEntity<?> priceWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        Stock stock = getStock(code);
 
-        List<StockRecord> records = recordRepository.findAllByStock(stock)
+        var list = recordRepo.findAllByStockAndDateBetweenOrderByDateAsc(stock, from, to)
                 .stream()
-                .sorted(Comparator.comparing(StockRecord::getDate))
+                .map(r -> Map.of(
+                        "date", r.getDate().toString(),
+                        "close", r.getClose()
+                ))
                 .toList();
 
-        // ===============================
-        // PRICE SERIES
-        // ===============================
-        List<String> dates = records.stream()
-                .map(r -> r.getDate().toString())
-                .toList();
-
-        List<Double> closes = records.stream()
-                .map(r -> r.getClose().doubleValue())
-                .toList();
-
-        // ===============================
-        // MASS SERIES
-        // ===============================
-        var masses = stockMassService.getMassPoints(stock); // -> List<MassPoint>
-
-        List<String> massDates = masses.stream().map(m -> m.date().toString()).toList();
-        List<Double> massValues = masses.stream().map(m -> m.mass().doubleValue()).toList();
-
-        // ===============================
-        // FREQUENCY SERIES
-        // ===============================
-        var daily = stockFrequencyService.getFrequencyPoints(stock, PeriodType.DAILY);
-        var weekly = stockFrequencyService.getFrequencyPoints(stock, PeriodType.WEEKLY);
-        var monthly = stockFrequencyService.getFrequencyPoints(stock, PeriodType.MONTHLY);
-        var yearly = stockFrequencyService.getFrequencyPoints(stock, PeriodType.YEARLY);
-
-        model.addAttribute("stock", stock);
-
-        model.addAttribute("dates", dates);
-        model.addAttribute("closes", closes);
-
-        model.addAttribute("massDates", massDates);
-        model.addAttribute("massValues", massValues);
-
-        model.addAttribute("daily", daily);
-        model.addAttribute("weekly", weekly);
-        model.addAttribute("monthly", monthly);
-        model.addAttribute("yearly", yearly);
-
-        return "analytics";
+        return ResponseEntity.ok(list);
     }
 
+    // -------------------------------
+    // MASS WINDOW
+    // -------------------------------
+    @GetMapping("/api/{code}/mass-window")
+    @ResponseBody
+    public List<Map<String,Object>> massWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return massService.getMassWindow(getStock(code), from, to);
+    }
 
+    // -------------------------------
+    // FREQUENCY WINDOWS
+    // -------------------------------
+    @GetMapping("/api/{code}/frequency-window")
+    @ResponseBody
+    public List<Map<String,Object>> frequencyWindow(
+            @PathVariable String code,
+            @RequestParam PeriodType period,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return frequencyService.getFrequencyWindow(getStock(code), period, from, to);
+    }
+
+    // -------------------------------
+    // DELTAS
+    // -------------------------------
+    @GetMapping("/api/{code}/delta-window")
+    @ResponseBody
+    public List<Map<String,Object>> deltaWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return deltaService.getDeltaWindow(getStock(code), from, to);
+    }
+
+    // -------------------------------
+    // KINETICS
+    // -------------------------------
+    @GetMapping("/api/{code}/kinetics-window")
+    @ResponseBody
+    public List<Map<String,Object>> kineticsWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return kineticsService.getKineticsWindow(getStock(code), from, to);
+    }
+
+    // -------------------------------
+    // OSCILLATION
+    // -------------------------------
+    @GetMapping("/api/{code}/oscillation-window")
+    @ResponseBody
+    public List<Map<String,Object>> oscillationWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return oscillationService.getOscillationWindow(getStock(code), from, to);
+    }
 }
-

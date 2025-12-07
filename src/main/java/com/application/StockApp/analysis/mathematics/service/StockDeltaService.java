@@ -7,6 +7,7 @@ import com.application.StockApp.records.model.StockRecord;
 import com.application.StockApp.records.repository.StockRecordRepository;
 import com.application.StockApp.stock.model.Stock;
 import com.application.StockApp.analysis.mathematics.repository.StockDeltaRepository;
+import com.application.StockApp.stock.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,8 @@ public class StockDeltaService {
 
     private final StockRecordRepository recordRepo;
     private final StockDeltaRepository deltaRepo;
+    private final StockRepository stockRepository;
+    private final StockRecordRepository recordRepository;
 
     private static final int EMA_PERIOD = 5;
     private static final BigDecimal EMA_ALPHA =
@@ -123,7 +126,7 @@ public class StockDeltaService {
                     .delta2(delta2)
                     .sign(sign)
                     .signChange(signChange)
-                    .volatility(BigDecimal.ZERO) // можеш да добавиш rolling window
+                    .volatility(BigDecimal.ZERO)
                     .deltaMomentum(deltaMomentum)
                     .signMomentum(signMomentumCounter)
                     .emaMomentum(emaMomentum)
@@ -199,5 +202,43 @@ public class StockDeltaService {
         }
 
         return MomentumPattern.NONE;
+    }
+
+    // --------- Raw price series за графиката ---------
+    public List<Map<String, Object>> getRawPriceSeries(String stockCode) {
+
+        Stock stock = stockRepository.findByStockCode(stockCode)
+                .orElseThrow(() -> new RuntimeException("Stock not found: " + stockCode));
+
+        List<StockRecord> records = recordRepository.findAllByStockOrderByDateAsc(stock);
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (StockRecord r : records) {
+            Map<String, Object> point = new HashMap<>();
+            point.put("date", r.getDate().toString());
+            point.put("price", r.getClose());
+            result.add(point);
+        }
+
+        return result;
+    }
+
+    // --------- Пълна серия от делти за дадена акция ---------
+    public List<StockDelta> getDeltas(Stock stock) {
+        return deltaRepo.findAllByStockOrderByDateAsc(stock);
+    }
+
+    public List<Map<String, Object>> getDeltaWindow(Stock stock, LocalDate from, LocalDate to) {
+
+        return getDeltas(stock).stream()
+                .filter(d -> !d.getDate().isBefore(from) && !d.getDate().isAfter(to))
+                .map(d -> Map.<String, Object>of(
+                        "date", d.getDate().toString(),
+                        "delta", d.getDelta(),
+                        "momentum", d.getMomentum(),
+                        "acceleration", d.getAcceleration()
+                ))
+                .toList();
     }
 }

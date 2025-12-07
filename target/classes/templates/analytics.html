@@ -1,72 +1,93 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="layout :: layout(~{::content})">
+<html xmlns:th="http://www.thymeleaf.org">
 
-<content>
+<th:block th:replace="layout :: layout(~{::content})">
 
-    <h1>Analytics</h1>
+    <section class="analytics" th:fragment="content">
+        <h1>Analytics Dashboard</h1>
 
-    <form method="get" id="stockForm">
-        <label>Select Stock:</label>
-        <select name="stock" onchange="location.href='/analytics/' + this.value">
-            <option value="">-- Select --</option>
-            <option th:each="s : ${stocks}"
-                    th:value="${s.stockCode}"
-                    th:text="${s.stockCode}"
-                    th:selected="${stock != null and stock.stockCode == s.stockCode}">
-            </option>
-        </select>
-    </form>
+        <!-- Филтри -->
+        <form method="get" class="filters">
+            <label>
+                Stock:
+                <select name="code" id="stockSelect">
+                    <option th:each="s : ${stocks}"
+                            th:value="${s.stockCode}"
+                            th:selected="${selectedCode == s.stockCode}"
+                            th:text="${s.stockCode + ' - ' + s.stockName}">
+                    </option>
+                </select>
+            </label>
 
-    <div th:if="${stock != null}">
+            <label>
+                From:
+                <input type="date" name="from" id="fromDate"
+                       th:value="${fromDate}"/>
+            </label>
 
-        <h2 th:text="'Analytics for ' + ${stock.stockCode}"></h2>
+            <label>
+                To:
+                <input type="date" name="to" id="toDate"
+                       th:value="${toDate}"/>
+            </label>
+        </form>
 
-        <!-- ===== PRICE ===== -->
-        <h3>Price</h3>
-        <canvas id="priceChart"
-                th:attr="data-code=${stock.stockCode}"
-                style="width:100%; height:350px;"></canvas>
+        <!-- PRICE -->
+        <div class="card wide">
+            <h3>📈 Price</h3>
+            <canvas id="priceChart"></canvas>
+        </div>
 
-        <!-- ===== MASS ===== -->
-        <h3>Mass</h3>
-        <canvas id="massChart"
-                th:attr="data-code=${stock.stockCode}"
-                style="width:100%; height:300px;"></canvas>
+        <!-- MASS -->
+        <div class="card wide">
+            <h3>⚖ Mass</h3>
+            <canvas id="massChart"></canvas>
+        </div>
 
-        <!-- ===== FREQUENCY ===== -->
-        <h3>Daily Frequency</h3>
-        <canvas id="dailyChart"
-                th:attr="data-code=${stock.stockCode}"
-                style="width:100%; height:250px;"></canvas>
+        <!-- FREQUENCY -->
+        <div class="card grid-2">
+            <div>
+                <h3>Weekly Frequency</h3>
+                <canvas id="freqWeeklyChart"></canvas>
+            </div>
+            <div>
+                <h3>Monthly Frequency</h3>
+                <canvas id="freqMonthlyChart"></canvas>
+            </div>
+            <div>
+                <h3>Yearly Frequency</h3>
+                <canvas id="freqYearlyChart"></canvas>
+            </div>
+        </div>
 
-        <h3>Weekly Frequency</h3>
-        <canvas id="weeklyChart"
-                th:attr="data-code=${stock.stockCode}"
-                style="width:100%; height:250px;"></canvas>
+        <!-- DELTA -->
+        <div class="card wide">
+            <h3>Δ Price & Momentum</h3>
+            <canvas id="deltaChart"></canvas>
+        </div>
 
-        <h3>Monthly Frequency</h3>
-        <canvas id="monthlyChart"
-                th:attr="data-code=${stock.stockCode}"
-                style="width:100%; height:250px;"></canvas>
+        <!-- KINETICS -->
+        <div class="card wide">
+            <h3>Kinetics (velocity, acceleration, force)</h3>
+            <canvas id="kineticsChart"></canvas>
+        </div>
 
-        <h3>Yearly Frequency</h3>
-        <canvas id="yearlyChart"
-                th:attr="data-code=${stock.stockCode}"
-                style="width:100%; height:250px;"></canvas>
+        <!-- OSCILLATION -->
+        <div class="card wide">
+            <h3>Oscillation (real vs theoretical frequency)</h3>
+            <canvas id="oscillationChart"></canvas>
+        </div>
 
-    </div>
+        <!-- Скриптове -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="/js/priceChart.js"></script>
+        <script src="/js/massChart.js"></script>
+        <script src="/js/frequencyCharts.js"></script>
+        <script src="/js/deltaChart.js"></script>
+        <script src="/js/kineticsChart.js"></script>
+        <script src="/js/oscillationChart.js"></script>
+    </section>
 
-    <!-- Chart libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+</th:block>
 
-    <!-- Our scripts -->
-    <script src="/js/priceChart.js"></script>
-    <script src="/js/massChart.js"></script>
-    <script src="/js/frequencyCharts.js"></script>
-
-</content>
 </html>

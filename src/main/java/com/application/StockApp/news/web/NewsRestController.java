@@ -1,7 +1,7 @@
 package com.application.StockApp.news.web;
 
 import com.application.StockApp.news.service.NewsService;
-import com.application.StockApp.web.dto.NewsDto;
+import com.application.StockApp.news.web.dto.NewsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

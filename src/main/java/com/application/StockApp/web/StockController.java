@@ -1,57 +1,115 @@
 package com.application.StockApp.web;
 
+import com.application.StockApp.analysis.mathematics.service.StockDeltaService;
+import com.application.StockApp.analysis.physics.model.PeriodType;
+import com.application.StockApp.analysis.physics.service.*;
 import com.application.StockApp.stock.model.Stock;
-import com.application.StockApp.records.model.StockRecord;
-import com.application.StockApp.records.repository.StockRecordRepository;
 import com.application.StockApp.stock.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/stocks")
 public class StockController {
 
-    private final StockRepository stockRepository;
-    private final StockRecordRepository recordRepository;
+    private final StockRepository stockRepo;
+    private final StockMassService massService;
+    private final StockFrequencyService frequencyService;
+    private final StockDeltaService deltaService;
+    private final StockKineticsService kineticsService;
+    private final StockOscillationService oscillationService;
 
-/*    @GetMapping("/stocks")
-    public String index(Model model) {
-        List<Stock> allStocks = stockRepository.findAll();
-        model.addAttribute("stocks", allStocks);
-
-        // примерни данни за "Top Gainer / Loser"
-        if (!allStocks.isEmpty()) {
-            model.addAttribute("topGainer", allStocks.get(0).getStockCode());
-        }
-
-        return "index";
-    }*/
-
-    @GetMapping("/stocks")
-    public String stocks(Model model) {
-        List<Stock> allStocks = stockRepository.findAll();
-        model.addAttribute("stocks", allStocks);
+    @GetMapping
+    public String stocksPage(Model model) {
+        model.addAttribute("stocks", stockRepo.findAll());
         return "stocks";
     }
 
-
-    @GetMapping("/stocks/{code}")
-    public String stockDetails(@PathVariable("code") String code, Model model) {
-        Stock stock = stockRepository.findByStockCodeIgnoreCase(code)
-                .orElseThrow(() -> new IllegalArgumentException("Stock not found: " + code));
-
-        List<StockRecord> records = recordRepository.findAllByStock(stock);
-
+    @GetMapping("/{code}")
+    public String stockDetails(@PathVariable String code, Model model) {
+        Stock stock = stockRepo.findByStockCodeIgnoreCase(code)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown stock: " + code));
         model.addAttribute("stock", stock);
-        model.addAttribute("records", records);
-
-        return "stock-details";
+        return "stocks";
     }
 
+    private Stock getStock(String code) {
+        return stockRepo.findByStockCodeIgnoreCase(code)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown stock: " + code));
+    }
 
+    // -----------------------------
+    // MASS WINDOW
+    // -----------------------------
+    @GetMapping("/api/{code}/mass-window")
+    @ResponseBody
+    public List<Map<String,Object>> massWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return massService.getMassWindow(getStock(code), from, to);
+    }
+
+    // -----------------------------
+    // FREQUENCY WINDOW
+    // -----------------------------
+    @GetMapping("/api/{code}/frequency-window")
+    @ResponseBody
+    public List<Map<String,Object>> frequencyWindow(
+            @PathVariable String code,
+            @RequestParam PeriodType period,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return frequencyService.getFrequencyWindow(getStock(code), period, from, to);
+    }
+
+    // -----------------------------
+    // DELTA WINDOW
+    // -----------------------------
+    @GetMapping("/api/{code}/delta-window")
+    @ResponseBody
+    public List<Map<String,Object>> deltaWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return deltaService.getDeltaWindow(getStock(code), from, to);
+    }
+
+    // -----------------------------
+    // KINETICS WINDOW
+    // -----------------------------
+    @GetMapping("/api/{code}/kinetics-window")
+    @ResponseBody
+    public List<Map<String,Object>> kineticsWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return kineticsService.getKineticsWindow(getStock(code), from, to);
+    }
+
+    // -----------------------------
+    // OSCILLATION WINDOW
+    // -----------------------------
+    @GetMapping("/api/{code}/oscillation-window")
+    @ResponseBody
+    public List<Map<String,Object>> oscillationWindow(
+            @PathVariable String code,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return oscillationService.getOscillationWindow(getStock(code), from, to);
+    }
 }

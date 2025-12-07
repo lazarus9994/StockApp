@@ -1,4 +1,4 @@
-package com.application.StockApp.web.dto;
+package com.application.StockApp.news.web.dto;
 
 import lombok.Data;
 

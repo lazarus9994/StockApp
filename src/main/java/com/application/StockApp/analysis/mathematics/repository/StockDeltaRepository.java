@@ -12,4 +12,5 @@ public interface StockDeltaRepository extends JpaRepository<StockDelta, UUID> {
     List<StockDelta> findAllByStockOrderByDateAsc(Stock stock);
 
     void deleteAllByStock(Stock stock);
+
 }

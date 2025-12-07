@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +44,7 @@ public class StockKineticsService {
                 .filter(m -> !Boolean.TRUE.equals(m.getAggregated()))
                 .collect(Collectors.toMap(
                         StockMass::getDate,
-                        Function.identity(),
+                        java.util.function.Function.identity(),
                         (a, b) -> a
                 ));
 
@@ -120,5 +119,25 @@ public class StockKineticsService {
         if (c == 0) return BigDecimal.ZERO;
 
         return sum.divide(BigDecimal.valueOf(c), 6, RoundingMode.HALF_UP);
+    }
+
+    // --------- Пълна серия за кинетиката ---------
+    public List<StockKinetics> getKinetics(Stock stock) {
+        return kineticsRepository.findAllByStockOrderByDateAsc(stock);
+    }
+
+    public List<Map<String, Object>> getKineticsWindow(Stock stock, LocalDate from, LocalDate to) {
+
+        return getKinetics(stock).stream()
+                .filter(k -> !k.getDate().isBefore(from) && !k.getDate().isAfter(to))
+                .map(k -> Map.<String, Object>of(
+                        "date", k.getDate().toString(),
+                        "price", k.getPrice(),
+                        "velocity", k.getVelocity(),
+                        "acceleration", k.getAcceleration(),
+                        "mass", k.getMass(),
+                        "netForce", k.getNetForce()
+                ))
+                .toList();
     }
 }
