@@ -22,7 +22,7 @@ import java.util.*;
 public class StockDeltaService {
 
     private final StockRecordRepository recordRepo;
-    private final StockDeltaRepository deltaRepo;
+    private final StockDeltaRepository deltaRepository;
     private final StockRepository stockRepository;
     private final StockRecordRepository recordRepository;
 
@@ -33,7 +33,7 @@ public class StockDeltaService {
     @Transactional
     public void computePriceDeltas(Stock stock) {
 
-        deltaRepo.deleteAllByStock(stock);
+        deltaRepository.deleteAllByStock(stock);
 
         List<StockRecord> records = recordRepo.findAllByStock(stock).stream()
                 .sorted(Comparator.comparing(StockRecord::getDate))
@@ -134,7 +134,7 @@ public class StockDeltaService {
                     .momentumPattern(pattern)
                     .build();
 
-            deltaRepo.save(d);
+            deltaRepository.save(d);
 
             prevEmaMomentum = emaMomentum;
             prevDelta = delta;
@@ -226,19 +226,7 @@ public class StockDeltaService {
 
     // --------- Пълна серия от делти за дадена акция ---------
     public List<StockDelta> getDeltas(Stock stock) {
-        return deltaRepo.findAllByStockOrderByDateAsc(stock);
+        return deltaRepository.findAllByStockOrderByDateAsc(stock);
     }
 
-    public List<Map<String, Object>> getDeltaWindow(Stock stock, LocalDate from, LocalDate to) {
-
-        return getDeltas(stock).stream()
-                .filter(d -> !d.getDate().isBefore(from) && !d.getDate().isAfter(to))
-                .map(d -> Map.<String, Object>of(
-                        "date", d.getDate().toString(),
-                        "delta", d.getDelta(),
-                        "momentum", d.getMomentum(),
-                        "acceleration", d.getAcceleration()
-                ))
-                .toList();
-    }
 }

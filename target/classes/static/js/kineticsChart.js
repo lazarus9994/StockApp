@@ -1,86 +1,44 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('kineticsChart');
+console.log("🔥 kineticsChart.js loaded");
+
+document.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById("kineticsChart");
     if (!canvas) return;
 
-    const stockSelect = document.getElementById('stockSelect');
-    const fromInput = document.getElementById('fromDate');
-    const toInput = document.getElementById('toDate');
-
-    let kineticsChart;
+    let chart = null;
 
     async function loadKinetics() {
-        const code = stockSelect?.value;
+        const code = canvas.dataset.code;
         if (!code) return;
 
-        const from = fromInput?.value;
-        const to = toInput?.value;
+        const { from, to } = getRange();
 
-        const params = new URLSearchParams();
-        if (from) params.append('from', from);
-        if (to) params.append('to', to);
+        const url = `/api/stocks/${code}/kinetics-window?from=${from}&to=${to}`;
+        console.log("🌐 kinetics:", url);
 
-        const res = await fetch(`/api/stocks/${code}/kinetics-window?` + params.toString());
+        const res = await fetch(url);
         if (!res.ok) return;
 
         const data = await res.json();
 
-        const labels = data.map(p => p.date);
-        const velocity = data.map(p => Number(p.velocity || 0));
-        const acceleration = data.map(p => Number(p.acceleration || 0));
-        const force = data.map(p => Number(p.netForce || 0));
+        const labels = data.map(x => x.date);
+        const v = data.map(x => Number(x.velocity));
+        const a = data.map(x => Number(x.acceleration));
 
-        if (kineticsChart) {
-            kineticsChart.destroy();
-        }
+        if (chart) chart.destroy();
 
-        const ctx = canvas.getContext('2d');
-        kineticsChart = new Chart(ctx, {
-            type: 'line',
+        chart = new Chart(canvas.getContext("2d"), {
+            type: "line",
             data: {
                 labels,
                 datasets: [
-                    {
-                        label: 'Velocity',
-                        data: velocity,
-                        borderWidth: 2,
-                        tension: 0.2,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Acceleration',
-                        data: acceleration,
-                        borderWidth: 2,
-                        borderDash: [4, 4],
-                        tension: 0.2,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Force (Δmv)',
-                        data: force,
-                        borderWidth: 1,
-                        borderDash: [2, 2],
-                        tension: 0.2,
-                        pointRadius: 0
-                    }
+                    { label: "Velocity", data: v, borderWidth: 2 },
+                    { label: "Acceleration", data: a, borderWidth: 2 }
                 ]
             },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    x: { title: { display: true, text: 'Date' } },
-                    y: { title: { display: true, text: 'Value' } }
-                }
-            }
+            options: { responsive: true }
         });
     }
 
-    stockSelect?.addEventListener('change', loadKinetics);
-    fromInput?.addEventListener('change', loadKinetics);
-    toInput?.addEventListener('change', loadKinetics);
-
+    window.addEventListener("stockChanged", loadKinetics);
     loadKinetics();
 });

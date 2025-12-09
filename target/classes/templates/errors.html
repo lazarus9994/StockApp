@@ -1,16 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
-<section style="text-align:center; margin-top:100px;">
-    <h2 style="color:#cc0000;">Oops! Something went wrong.</h2>
+<html xmlns:th="http://www.thymeleaf.org">
 
-    <p th:text="'Error: ' + ${status} + ' - ' + ${error}" style="margin-top:20px;"></p>
-    <p th:text="${message}" style="color:#555;"></p>
+<!-- Correct signature: layout(content, page, scripts) -->
+<th:block th:replace="~{layout :: layout(~{this :: content}, 'error', ~{this :: scripts})}">
 
-    <div style="margin-top:30px;">
-        <a th:href="@{/}" style="color:blue; text-decoration:underline;">Back to Home</a>
-    </div>
-</section>
-</body>
+    <!-- CONTENT -->
+    <section th:fragment="content">
+
+        <h1>Error</h1>
+
+        <div class="card wide">
+            <h3>An unexpected error occurred</h3>
+
+            <p th:text="${message}">Something went wrong.</p>
+
+            <a href="/" class="btn">Back to Home</a>
+        </div>
+
+    </section>
+
+    <!-- SCRIPTS (empty but required) -->
+    <th:block th:fragment="scripts"></th:block>
+
+</th:block>
+
 </html>

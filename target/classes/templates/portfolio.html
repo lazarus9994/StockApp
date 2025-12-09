@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
-<section>
-    <h2>My Portfolio</h2>
-    <p th:text="'Total stocks: ' + ${portfolioSize}"></p>
-</section>
-</body>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Correct signature: layout(content, page, scripts) -->
+<th:block th:replace="~{layout :: layout(~{this :: content}, 'portfolio', ~{this :: scripts})}">
+
+    <!-- CONTENT -->
+    <section th:fragment="content">
+
+        <h2>My Portfolio</h2>
+        <p th:text="'Total stocks: ' + ${portfolioSize}"></p>
+
+    </section>
+
+    <!-- SCRIPTS (empty but required by layout) -->
+    <th:block th:fragment="scripts"></th:block>
+
+</th:block>
+
 </html>

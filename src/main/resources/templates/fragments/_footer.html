@@ -1,4 +1,26 @@
-<footer th:fragment="footer" class="footer" xmlns:th="">
-    <p>© 2025 StockApp | Built with Spring Boot + Thymeleaf</p>
-    <p>https://github.com/lazarus9994/StockApp</p>
-</footer>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="footer">
+
+    <footer class="app-footer">
+
+        <div class="footer-links">
+
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/settings}">Settings</a>
+            <a th:href="@{/portfolio}">Portfolio</a>
+            <a th:href="@{/}">Home</a>
+
+        </div>
+
+        <div class="footer-copy">
+            <p>© 2025 StockApp — All rights reserved.</p>
+        </div>
+
+    </footer>
+
+</th:block>
+
+</html>

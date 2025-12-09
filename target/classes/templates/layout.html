@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      lang="en"
-      th:fragment="layout(content)">
+      th:fragment="layout(content, page, scripts)">
 
 <head>
     <meta charset="UTF-8">
@@ -9,21 +8,27 @@
 
     <title th:text="${pageTitle} ?: 'StockApp'">StockApp</title>
 
-    <!-- Styles -->
+    <!-- Global Styles -->
     <link rel="stylesheet" th:href="@{/css/layout.css}">
     <link rel="stylesheet" th:href="@{/css/components.css}">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
 </head>
 
-<body th:with="path=${currentPath} ?: '/'"
-      th:class="${#strings.startsWith(path,'/login') or #strings.startsWith(path,'/register')
-                ? 'auth-page' : 'app-layout'}">
+<body th:class="${page}">
+
+<!-- ========================= -->
+<!-- HEADER (always visible)   -->
+<!-- ========================= -->
+<th:block th:replace="~{fragments/_header :: header}"></th:block>
+
 
 <div class="app-container">
 
-    <!-- Sidebar (скрит при login/register) -->
+    <!-- ========================= -->
+    <!-- SIDEBAR (hidden on login/register) -->
+    <!-- ========================= -->
     <aside class="sidebar"
-           th:if="${!#strings.startsWith(path,'/login') and !#strings.startsWith(path,'/register')}">
+           th:if="${page != 'login' and page != 'register'}">
 
         <div class="logo-section">
             <span class="logo">💹</span>
@@ -31,55 +36,36 @@
         </div>
 
         <nav class="nav-links">
-
-            <a th:href="@{/}" class="nav-item"
-               th:classappend="${path == '/'} ? ' active'">
-                <i>🏠</i><span>Dashboard</span>
-            </a>
-
-            <a th:href="@{/stocks}" class="nav-item"
-               th:classappend="${#strings.startsWith(path,'/stocks')} ? ' active'">
-                <i>📈</i><span>Stocks</span>
-            </a>
-
-            <a th:href="@{/analytics}" class="nav-item"
-               th:classappend="${#strings.startsWith(path,'/analytics')} ? ' active'">
-                <i>📊</i><span>Analytics</span>
-            </a>
-
-            <a th:href="@{/profile}" class="nav-item"
-               th:classappend="${#strings.startsWith(path,'/profile')} ? ' active'">
-                <i>👤</i><span>Profile</span>
-            </a>
-
-            <a th:href="@{/upload}" class="nav-item"
-               th:classappend="${#strings.startsWith(path,'/upload')} ? ' active'">
-                <i>📤</i><span>Upload CSV</span>
-            </a>
-
-            <a th:href="@{/imports}" class="nav-item"
-               th:classappend="${#strings.startsWith(path,'/imports')} ? ' active'">
-                <i>📁</i><span>Import Logs</span>
-            </a>
-
-            <a th:href="@{/reports}" class="nav-item"
-               th:classappend="${#strings.startsWith(path,'/reports')} ? ' active'">
-                <i>📜</i><span>Reports</span>
-            </a>
-
-            <a th:href="@{/logout}" class="nav-item">
-                <i>🚪</i><span>Logout</span>
-            </a>
-
+            <a th:href="@{/}" class="nav-item">🏠 Dashboard</a>
+            <a th:href="@{/stocks}" class="nav-item">📈 Stocks</a>
+            <a th:href="@{/analytics}" class="nav-item">📊 Analytics</a>
+            <a th:href="@{/user/profile}" class="nav-item">👤 Profile</a>
+            <a th:href="@{/upload}" class="nav-item">📤 Upload CSV</a>
+            <a th:href="@{/imports}" class="nav-item">📁 Import Logs</a>
+            <a th:href="@{/reports}" class="nav-item">📜 Reports</a>
+            <a th:href="@{/logout}" class="nav-item">🚪 Logout</a>
         </nav>
     </aside>
 
-    <!-- Main content -->
+
+    <!-- ========================= -->
+    <!-- MAIN CONTENT AREA         -->
+    <!-- ========================= -->
     <main class="main-content">
         <th:block th:replace="${content}"></th:block>
+
+        <!-- Optional page-specific scripts -->
+        <th:block th:replace="${scripts} ?: ~{}"></th:block>
     </main>
 
 </div>
+
+
+<!-- ========================= -->
+<!-- FOOTER (always visible)   -->
+<!-- ========================= -->
+<th:block th:replace="~{fragments/_footer :: footer}"></th:block>
+
 
 </body>
 </html>

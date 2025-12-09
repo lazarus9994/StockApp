@@ -126,18 +126,22 @@ public class StockKineticsService {
         return kineticsRepository.findAllByStockOrderByDateAsc(stock);
     }
 
-    public List<Map<String, Object>> getKineticsWindow(Stock stock, LocalDate from, LocalDate to) {
+    public List<Map<String, Object>> getKineticsSeries(Stock stock) {
 
-        return getKinetics(stock).stream()
-                .filter(k -> !k.getDate().isBefore(from) && !k.getDate().isAfter(to))
+        return kineticsRepository.findAllByStockOrderByDateAsc(stock)
+                .stream()
                 .map(k -> Map.<String, Object>of(
                         "date", k.getDate().toString(),
-                        "price", k.getPrice(),
-                        "velocity", k.getVelocity(),
-                        "acceleration", k.getAcceleration(),
-                        "mass", k.getMass(),
-                        "netForce", k.getNetForce()
+                        "price", safe(k.getPrice()),
+                        "velocity", safe(k.getVelocity()),
+                        "acceleration", safe(k.getAcceleration()),
+                        "mass", safe(k.getMass()),
+                        "netForce", safe(k.getNetForce())
                 ))
                 .toList();
+    }
+
+    private BigDecimal safe(BigDecimal v) {
+        return v == null ? BigDecimal.ZERO : v;
     }
 }

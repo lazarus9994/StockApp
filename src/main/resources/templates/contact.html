@@ -1,15 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
-<section style="max-width:400px; margin:auto;">
-    <h2>Contact Us</h2>
-    <form>
-        <input type="text" placeholder="Your Name" required>
-        <input type="email" placeholder="Your Email" required>
-        <textarea placeholder="Message"></textarea>
-        <button type="submit">Send</button>
-    </form>
-</section>
-</body>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Correct: layout(content, page, scripts) -->
+<th:block th:replace="~{layout :: layout(~{this :: content}, 'contact', ~{this :: scripts})}">
+
+    <!-- CONTENT -->
+    <section th:fragment="content">
+
+        <h1>Contact Us</h1>
+
+        <p>If you have questions, feedback, or technical issues, feel free to reach out.</p>
+
+        <div class="card wide">
+            <h3>Contact Information</h3>
+
+            <p>
+                <strong>Email:</strong> support@stockapp.com<br>
+                <strong>Phone:</strong> +1 (555) 123-4567
+            </p>
+
+            <p>
+                Our team will get back to you as soon as possible.
+            </p>
+        </div>
+
+        <div class="card wide">
+            <h3>Send a Message</h3>
+
+            <form method="post" action="/contact/send">
+                <label>Name:</label>
+                <input type="text" name="name" required>
+
+                <label>Email:</label>
+                <input type="email" name="email" required>
+
+                <label>Message:</label>
+                <textarea name="message" rows="5" required></textarea>
+
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+    </section>
+
+    <!-- SCRIPTS (empty but required by layout) -->
+    <th:block th:fragment="scripts"></th:block>
+
+</th:block>
+
 </html>

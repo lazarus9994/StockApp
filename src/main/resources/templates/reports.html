@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="~{layout :: layout(~{::body})}">
+      th:replace="~{layout :: layout(~{this :: content}, 'reports', ~{this :: scripts})}">
+
 <body>
 
-<section class="reports-container">
+<section class="reports-container" th:fragment="content">
 
     <h1 class="page-title">📰 Stock News Reports</h1>
     <p class="page-subtitle">Latest news collected from external sources</p>
@@ -52,6 +53,11 @@
     </div>
 
 </section>
+
+<!-- SCRIPTS -->
+<th:block th:fragment="scripts">
+    <!-- Няма JS за тази страница, но fragment е ЗАДЪЛЖИТЕЛЕН -->
+</th:block>
 
 <link rel="stylesheet" th:href="@{/css/reports.css}">
 </body>

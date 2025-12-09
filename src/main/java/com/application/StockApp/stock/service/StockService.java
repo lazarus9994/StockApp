@@ -68,4 +68,6 @@ public class StockService {
     public List<String> getAllStockCodes() {
         return stockRepository.findAll().stream().map(Stock::getStockCode).toList();
     }
+
+
 }

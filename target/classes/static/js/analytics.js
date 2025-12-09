@@ -1,75 +1,41 @@
-new Chart(document.getElementById("priceChart"), {
-    type: "line",
-    data: {
-        labels: dates,
-        datasets: [{
-            label: "Close Price",
-            data: closes,
-            fill: false
-        }]
-    }
+console.log("🔥 analytics.js loaded");
+
+// ========== DOM REFERENCES ==========
+const stockSelect = document.getElementById("stockSelect");
+const fromInput = document.getElementById("fromDate");
+const toInput = document.getElementById("toDate");
+
+// ========== RANGE HANDLER ==========
+function getRange() {
+    return {
+        from: fromInput.value || "1900-01-01",
+        to: toInput.value || "2100-01-01"
+    };
+}
+
+// ========== UPDATE CANVAS DATA-CODE WHEN STOCK CHANGES ==========
+function updateCanvasCodes(code) {
+    document.querySelectorAll("canvas[data-code]").forEach(canvas => {
+        canvas.dataset.code = code;
+    });
+}
+
+// ========== TRIGGER ALL CHART RELOADERS ==========
+function triggerReload() {
+    window.dispatchEvent(new Event("stockChanged"));
+}
+
+// ========== EVENT LISTENERS ==========
+stockSelect?.addEventListener("change", (e) => {
+    const code = e.target.value;
+    if (!code) return;
+
+    updateCanvasCodes(code);
+    triggerReload();
 });
 
-new Chart(document.getElementById("massChart"), {
-    type: "line",
-    data: {
-        labels: massDates,
-        datasets: [{
-            label: "Mass",
-            data: massValues,
-            fill: false
-        }]
-    }
-});
+fromInput?.addEventListener("change", triggerReload);
+toInput?.addEventListener("change", triggerReload);
 
-// DAILY
-new Chart(document.getElementById("dailyChart"), {
-    type: "line",
-    data: {
-        labels: daily.map(e => e.date),
-        datasets: [{
-            label: "Daily Frequency",
-            data: daily.map(e => e.frequency),
-            fill: false
-        }]
-    }
-});
-
-// WEEKLY
-new Chart(document.getElementById("weeklyChart"), {
-    type: "line",
-    data: {
-        labels: weekly.map(e => e.date),
-        datasets: [{
-            label: "Weekly Frequency",
-            data: weekly.map(e => e.frequency),
-            fill: false
-        }]
-    }
-});
-
-// MONTHLY
-new Chart(document.getElementById("monthlyChart"), {
-    type: "line",
-    data: {
-        labels: monthly.map(e => e.date),
-        datasets: [{
-            label: "Monthly Frequency",
-            data: monthly.map(e => e.frequency),
-            fill: false
-        }]
-    }
-});
-
-// YEARLY
-new Chart(document.getElementById("yearlyChart"), {
-    type: "line",
-    data: {
-        labels: yearly.map(e => e.date),
-        datasets: [{
-            label: "Yearly Frequency",
-            data: yearly.map(e => e.frequency),
-            fill: false
-        }]
-    }
-});
+// Initial load
+triggerReload();

@@ -1,92 +1,46 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('oscillationChart');
+console.log("🔥 oscillationChart.js loaded");
+
+document.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById("oscillationChart");
     if (!canvas) return;
 
-    const stockSelect = document.getElementById('stockSelect');
-    const fromInput = document.getElementById('fromDate');
-    const toInput = document.getElementById('toDate');
-
-    let oscChart;
+    let chart = null;
 
     async function loadOscillation() {
-        const code = stockSelect?.value;
+        const code = canvas.dataset.code;
         if (!code) return;
 
-        const from = fromInput?.value;
-        const to = toInput?.value;
+        const { from, to } = getRange();
 
-        const params = new URLSearchParams();
-        if (from) params.append('from', from);
-        if (to) params.append('to', to);
+        const url = `/api/stocks/${code}/oscillation-window?from=${from}&to=${to}`;
+        console.log("🌐 oscillation:", url);
 
-        const res = await fetch(`/api/stocks/${code}/oscillation-window?` + params.toString());
+        const res = await fetch(url);
         if (!res.ok) return;
 
         const data = await res.json();
 
-        const labels = data.map(p => p.startDate); // можем да ползваме startDate като ос
-        const realFreq = data.map(p => Number(p.realFrequency || 0));
-        const theorFreq = data.map(p => Number(p.theoreticalFrequency || 0));
-        const ratio = data.map(p => Number(p.ratio || 0));
+        const labels = data.map(p => p.startDate);
+        const r = data.map(p => Number(p.realFrequency || 0));
+        const t = data.map(p => Number(p.theoreticalFrequency || 0));
+        const g = data.map(p => Number(p.ratio || 0));
 
-        if (oscChart) {
-            oscChart.destroy();
-        }
+        if (chart) chart.destroy();
 
-        const ctx = canvas.getContext('2d');
-        oscChart = new Chart(ctx, {
-            type: 'line',
+        chart = new Chart(canvas.getContext("2d"), {
+            type: "line",
             data: {
                 labels,
                 datasets: [
-                    {
-                        label: 'Real frequency',
-                        data: realFreq,
-                        borderWidth: 2,
-                        tension: 0.2,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Theoretical frequency',
-                        data: theorFreq,
-                        borderWidth: 2,
-                        borderDash: [4, 4],
-                        tension: 0.2,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Ratio f_real / f_theor',
-                        data: ratio,
-                        borderWidth: 1,
-                        borderDash: [2, 2],
-                        tension: 0.2,
-                        pointRadius: 0,
-                        yAxisID: 'y2'
-                    }
+                    { label: "Real", data: r, borderWidth: 2 },
+                    { label: "Theoretical", data: t, borderWidth: 2 },
+                    { label: "Ratio", data: g, borderWidth: 2, yAxisID: "y2" }
                 ]
             },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    x: { title: { display: true, text: 'Period start' } },
-                    y: { title: { display: true, text: 'Frequency' } },
-                    y2: {
-                        position: 'right',
-                        title: { display: true, text: 'Ratio' },
-                        grid: { drawOnChartArea: false }
-                    }
-                }
-            }
+            options: { responsive: true }
         });
     }
 
-    stockSelect?.addEventListener('change', loadOscillation);
-    fromInput?.addEventListener('change', loadOscillation);
-    toInput?.addEventListener('change', loadOscillation);
-
+    window.addEventListener("stockChanged", loadOscillation);
     loadOscillation();
 });

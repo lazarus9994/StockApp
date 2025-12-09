@@ -140,14 +140,4 @@ public class StockOscillationService {
                 ))
                 .toList();
     }
-
-    public List<Map<String, Object>> getOscillationWindow(Stock stock, LocalDate from, LocalDate to) {
-
-        return getOscillationData(stock).stream()
-                .filter(o -> {
-                    LocalDate d = LocalDate.parse(o.get("date").toString());
-                    return !d.isBefore(from) && !d.isAfter(to);
-                })
-                .toList();
-    }
 }

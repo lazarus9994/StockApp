@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -93,4 +94,20 @@ public class StockTrajectoryService {
     private BigDecimal safe(BigDecimal v) {
         return v == null ? BigDecimal.ZERO : v;
     }
+
+    public List<Map<String, Object>> getTrajectoryData(Stock stock) {
+
+        return trajectoryRepository.findAllByStockOrderByDateAsc(stock)
+                .stream()
+                .map(t -> Map.<String, Object>of(
+                        "date", t.getDate().toString(),
+                        "predictedPrice", t.getPredictedPrice(),
+                        "predictedVelocity", t.getPredictedVelocity(),
+                        "error", t.getError(),
+                        "inertiaIndex", t.getInertiaIndex(),
+                        "forceEfficiency", t.getForceEfficiency()
+                ))
+                .toList();
+    }
+
 }

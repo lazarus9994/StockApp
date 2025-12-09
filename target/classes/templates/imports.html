@@ -1,13 +1,62 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
+<html xmlns:th="http://www.thymeleaf.org">
 
-<h1>Import Logs</h1>
+<th:block th:replace="~{layout :: layout(~{this :: content}, 'imports', ~{this :: scripts})}">
 
-<ul>
-    <li th:each="i : ${imports}" th:text="${i}"></li>
-</ul>
+    <!-- CONTENT -->
+    <section th:fragment="content">
 
-</body>
+        <div class="page-header">
+            <h1>Import Logs</h1>
+            <p>Review historical CSV imports and their status.</p>
+        </div>
+
+        <div class="card wide">
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Imported At</th>
+                    <th>Records</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <!-- No Records -->
+                <tr th:if="${#lists.isEmpty(imports)}">
+                    <td colspan="4" class="center">
+                        No import logs found.
+                    </td>
+                </tr>
+
+                <!-- Import Rows -->
+                <tr th:each="imp : ${imports}">
+                    <td th:text="${imp.fileName}"></td>
+
+                    <td th:text="${#temporals.format(imp.importedAt, 'yyyy-MM-dd HH:mm')}"></td>
+
+                    <td th:text="${imp.recordsCount}"></td>
+
+                    <td>
+                        <span th:text="${imp.status}"
+                              th:classappend="${imp.status == 'SUCCESS'} ? 'status-success' : 'status-error'">
+                        </span>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- SCRIPTS (required fragment, even if empty) -->
+    <th:block th:fragment="scripts"></th:block>
+
+</th:block>
+
 </html>

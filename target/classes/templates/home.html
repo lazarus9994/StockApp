@@ -1,23 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
-<section class="user-home">
-    <h1 class="page-title">👤 My Watchlist</h1>
-    <p class="page-subtitle">Your personalized stock overview</p>
+<html xmlns:th="http://www.thymeleaf.org">
 
-    <div class="stock-list">
-        <div class="card stock-card" th:each="stock : ${userStocks}">
-            <h3 th:text="${stock.name}">Apple Inc.</h3>
-            <p>
-                Code: <span th:text="${stock.code}">AAPL</span><br>
-                Current Price: <span th:text="${stock.close}">$187.90</span><br>
-                Change: <span th:text="${stock.changePercent + '%'}"
-                              th:classappend="${stock.changePercent > 0} ? 'positive' : 'negative'">
-                </span>
-            </p>
+<!-- Correct: layout(content, page, scripts) -->
+<th:block th:replace="~{layout :: layout(~{this :: content}, 'home', ~{this :: scripts})}">
+
+    <!-- CONTENT -->
+    <section th:fragment="content">
+
+        <h1>Welcome to StockApp</h1>
+        <p>This platform allows you to analyze stock data, view charts, import records, and manage your watchlist.</p>
+
+        <div class="cards-grid">
+
+            <div class="card">
+                <h3>Total Stocks</h3>
+                <p th:text="${totalStocks}">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Total Records</h3>
+                <p th:text="${totalRecords}">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Watchlist</h3>
+                <p th:text="${watchlistCount}">0</p>
+            </div>
+
         </div>
-    </div>
-</section>
-</body>
+
+        <div class="card wide">
+            <h3>📊 Overview Chart</h3>
+            <canvas id="homeChart"></canvas>
+        </div>
+
+    </section>
+
+    <!-- SCRIPTS -->
+    <th:block th:fragment="scripts">
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+        <script src="/js/homeChart.js"></script>
+
+    </th:block>
+
+</th:block>
+
 </html>

@@ -49,7 +49,7 @@ async function fetchAndUpdate(from, to) {
     const data = await res.json();
 
     const labels = data.map(r => new Date(r.date + "T00:00:00"));
-    const values = data.map(r => Number(r.close));
+    const values = data.map(r => Number(r.price));
 
     console.log(`📦 price: ${labels.length} points`);
     return { labels, values };

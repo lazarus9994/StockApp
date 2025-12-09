@@ -1,24 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
+<html xmlns:th="http://www.thymeleaf.org">
 
-<link rel="stylesheet" th:href="@{/css/upload.css}">
+<th:block th:replace="~{layout :: layout(~{this :: content}, 'upload', ~{this :: scripts})}">
 
-<div class="upload-container">
-    <h1>Upload CSV</h1>
+    <!-- CONTENT -->
+    <section th:fragment="content">
 
-    <form action="#" method="post" enctype="multipart/form-data">
-
-        <div class="upload-field">
-            <input type="file" name="file">
+        <div class="page-header">
+            <h1>Upload CSV File</h1>
+            <p>Import historical stock records from a CSV file.</p>
         </div>
 
-        <button class="upload-btn" type="submit">Upload</button>
-    </form>
+        <div class="card upload-card">
 
-    <p class="message" th:if="${message != null}" th:text="${message}"></p>
-</div>
+            <form th:action="@{/upload}" method="post" enctype="multipart/form-data">
 
-</body>
+                <label class="upload-label">Choose CSV File:</label>
+                <input type="file" name="file" accept=".csv" required class="upload-input">
+
+                <button type="submit" class="btn primary upload-btn">
+                    Upload File
+                </button>
+
+            </form>
+
+            <p class="upload-note">
+                Only .csv files with valid stock data will be processed.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- SCRIPTS (празно, но задължително за layout) -->
+    <th:block th:fragment="scripts"></th:block>
+
+</th:block>
+
 </html>

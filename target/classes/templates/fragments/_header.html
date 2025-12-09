@@ -1,10 +1,25 @@
-<header th:fragment="header" class="topbar" xmlns:th="http://www.w3.org/1999/xhtml">
-    <div class="logo">📈 StockApp</div>
-    <nav class="nav">
-        <a th:href="@{/}" class="nav-link">Dashboard</a>
-        <a th:href="@{/stocks}" class="nav-link">Stocks</a>
-        <a th:href="@{/upload}" class="nav-link">Import</a>
-        <a th:href="@{/profile}" class="nav-link">Profile</a>
-        <a th:href="@{/logout}" class="nav-btn">Logout</a>
-    </nav>
-</header>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="header">
+
+    <header class="app-header">
+
+        <div class="header-left">
+            <a th:href="@{/}" class="header-logo">
+                💹 <span>StockApp</span>
+            </a>
+        </div>
+
+        <div class="header-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/templates/about.html}">About</a>
+            <a th:href="@{/templates/contact.html}">Contact</a>
+            <a th:href="@{/templates/settings.html}">Settings</a>
+        </div>
+
+    </header>
+
+</th:block>
+
+</html>

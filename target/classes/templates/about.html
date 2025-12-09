@@ -1,10 +1,30 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout(~{::body})}">
-<body>
-<section>
-    <h2>About StockApp</h2>
-    <p>StockApp helps investors manage their portfolios with smart insights and clean visuals.</p>
-</section>
-</body>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Correct signature: layout(content, page, scripts) -->
+<th:block th:replace="~{layout :: layout(~{this :: content}, 'about', ~{this :: scripts})}">
+
+    <!-- CONTENT -->
+    <section th:fragment="content">
+
+        <h1>About</h1>
+
+        <p>
+            This project is a stock analytics and visualization platform designed for real-time
+            exploration of financial data, physics-inspired metrics, statistical modeling,
+            and interactive charting.
+        </p>
+
+        <p>
+            The platform allows importing stock data, analyzing it through multiple mathematical
+            layers, and visualizing price, mass, frequency, kinetics, oscillation and more.
+        </p>
+
+    </section>
+
+    <!-- SCRIPTS (required, even if empty) -->
+    <th:block th:fragment="scripts"></th:block>
+
+</th:block>
+
 </html>

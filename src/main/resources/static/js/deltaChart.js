@@ -1,77 +1,42 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('deltaChart');
+console.log("🔥 deltaChart.js loaded");
+
+document.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById("deltaChart");
     if (!canvas) return;
 
-    const stockSelect = document.getElementById('stockSelect');
-    const fromInput = document.getElementById('fromDate');
-    const toInput = document.getElementById('toDate');
-
-    let deltaChart;
+    let chart = null;
 
     async function loadDelta() {
-        const code = stockSelect?.value;
+        const code = canvas.dataset.code;
         if (!code) return;
 
-        const from = fromInput?.value;
-        const to = toInput?.value;
+        const { from, to } = getRange();
 
-        const params = new URLSearchParams();
-        if (from) params.append('from', from);
-        if (to) params.append('to', to);
+        const url = `/api/stocks/${code}/delta-window?from=${from}&to=${to}`;
+        console.log("🌐 delta:", url);
 
-        const res = await fetch(`/api/stocks/${code}/delta-window?` + params.toString());
+        const res = await fetch(url);
         if (!res.ok) return;
 
         const data = await res.json();
 
-        const labels = data.map(p => p.date);
-        const deltas = data.map(p => Number(p.delta || 0));
-        const ema = data.map(p => Number(p.emaMomentum || 0));
+        const labels = data.map(r => r.date);
+        const d = data.map(r => Number(r.delta));
 
-        if (deltaChart) {
-            deltaChart.destroy();
-        }
+        if (chart) chart.destroy();
 
-        const ctx = canvas.getContext('2d');
-        deltaChart = new Chart(ctx, {
-            type: 'line',
+        chart = new Chart(canvas.getContext("2d"), {
+            type: "line",
             data: {
                 labels,
                 datasets: [
-                    {
-                        label: 'Δ Price',
-                        data: deltas,
-                        borderWidth: 2,
-                        tension: 0.2,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'EMA Momentum',
-                        data: ema,
-                        borderWidth: 2,
-                        borderDash: [4, 4],
-                        tension: 0.2,
-                        pointRadius: 0
-                    }
+                    { label: "Delta", data: d, borderWidth: 2 }
                 ]
             },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    x: { title: { display: true, text: 'Date' } },
-                    y: { title: { display: true, text: 'Δ / Momentum' } }
-                }
-            }
+            options: { responsive: true }
         });
     }
 
-    stockSelect?.addEventListener('change', loadDelta);
-    fromInput?.addEventListener('change', loadDelta);
-    toInput?.addEventListener('change', loadDelta);
-
+    window.addEventListener("stockChanged", loadDelta);
     loadDelta();
 });
